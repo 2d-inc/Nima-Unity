@@ -4,8 +4,8 @@ using UnityEngine;
 
 namespace Nima.Unity.Editor 
 {
-	[CustomEditor(typeof(ActorImage2D))]
-	public class ActorImage2DInspector : UnityEditor.Editor 
+	[CustomEditor(typeof(ActorImageComponent))]
+	public class ActorImageComponentInspector : UnityEditor.Editor 
 	{
 		 Tool LastTool = Tool.None;
 

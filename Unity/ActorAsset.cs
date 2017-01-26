@@ -10,6 +10,7 @@ namespace Nima.Unity
 	{
 		[SerializeField]
 		private TextAsset m_RawAsset;
+
 		private Nima.Actor m_Actor;
 		private Mesh[] m_Meshes;
 		private ActorImage[] m_ImageNodes;
@@ -25,7 +26,8 @@ namespace Nima.Unity
 			m_RawAsset = asset;
 			using (MemoryStream ms = new MemoryStream(asset.bytes))
 			{
-				m_Actor = Nima.Actor.LoadFrom(ms);
+				m_Actor = new Actor();
+				m_Actor.LoadFrom(ms);
 				if(m_Actor != null)
 				{
 					InitializeActor();
@@ -80,11 +82,11 @@ namespace Nima.Unity
 
 		private void InitializeActor()
 		{
-			//const float NimaToUnityScale = 0.01f;
+			const float NimaToUnityScale = 0.01f;
 
 			IEnumerable<ActorNode> nodes = m_Actor.Nodes;
-			//m_Actor.Root.ScaleX = NimaToUnityScale;
-			//m_Actor.Root.ScaleY = NimaToUnityScale;
+			m_Actor.Root.ScaleX = NimaToUnityScale;
+			m_Actor.Root.ScaleY = NimaToUnityScale;
 
 			int imgNodeCount = 0;
 			foreach(ActorNode node in nodes)
@@ -125,11 +127,14 @@ namespace Nima.Unity
 						int aiVertexBoneWeightOffset = ai.VertexBoneWeightOffset;
 						int idx = 0;
 
+						Mat2D newWorldOverride = new Mat2D();
+						Mat2D.Multiply(newWorldOverride, m_Actor.Root.Transform, ai.WorldTransformOverride);
+						ai.WorldTransformOverride = newWorldOverride;
 						// Unity expects skinned mesh vertices to be in bone world space (character world).
 						// So we transform them to our world transform.
 						BoneWeight[] weights = new BoneWeight[aiVertexCount];
 
-						float[] wt = ai.WorldTransform;
+						Mat2D wt = ai.WorldTransform;
 
 						for(int j = 0; j < aiVertexCount; j++)
 						{
@@ -157,7 +162,7 @@ namespace Nima.Unity
 						mesh.boneWeights = weights;
 
 						// Set up bind poses.
-						int bindBoneCount = ai.ConnectedBonesCount + 1; // Always an extra bone for the root transform (identity).
+						int bindBoneCount = ai.ConnectedBoneCount + 1; // Always an extra bone for the root transform (identity).
 
 						Matrix4x4[] bindPoses = new Matrix4x4[bindBoneCount];
 						for(int i = 0; i < bindBoneCount; i++)
@@ -168,8 +173,8 @@ namespace Nima.Unity
 						}
 
 						int bidx = 1;
-						float[] w = m_Actor.Root.Transform;
-						float[] temp = Mat2D.Create();
+						Mat2D w = m_Actor.Root.Transform;
+						Mat2D temp = new Mat2D();
 
 						foreach(ActorImage.BoneConnection bc in ai.BoneConnections)
 						{
@@ -223,7 +228,7 @@ namespace Nima.Unity
 					mesh.RecalculateNormals();
 
 					// We don't need to hold the geometry data in the node now that it's in our buffers.
-					ai.DisposeGeometry();
+					//ai.DisposeGeometry();
 				}
 			}
 		}

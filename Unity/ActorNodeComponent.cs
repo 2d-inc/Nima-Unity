@@ -1,13 +1,14 @@
 using System;
 using System.IO;
 using UnityEngine;
+using Nima.Math2D;
 
 namespace Nima.Unity
 {
 	[ExecuteInEditMode]
-	public class ActorNode2D : MonoBehaviour
+	public class ActorNodeComponent : MonoBehaviour
 	{
-		protected Actor2D m_Actor2D;
+		protected ActorComponent m_ActorComponent;
 		protected Nima.ActorNode m_ActorNode;
 
 		public Nima.ActorNode Node
@@ -18,9 +19,9 @@ namespace Nima.Unity
 			}
 		}
 
-		public virtual void Initialize(Actor2D actor2D, Nima.ActorNode actorNode)
+		public virtual void Initialize(ActorComponent actorComponent, Nima.ActorNode actorNode)
 		{
-			m_Actor2D = actor2D;
+			m_ActorComponent = actorComponent;
 			m_ActorNode = actorNode;
 
 			UpdateTransform();
@@ -33,7 +34,7 @@ namespace Nima.Unity
 				return;
 			}
 			m_ActorNode.UpdateTransforms();
-			float[] wt = m_ActorNode.WorldTransform;
+			Mat2D wt = m_ActorNode.WorldTransform;
 
 			float x = wt[0];
 			float y = wt[1];
@@ -49,10 +50,12 @@ namespace Nima.Unity
 			transform.localScale = new Vector3(scaleX, scaleY, 1.0f);
 		}
 
+#if UNITY_EDITOR
 		public void Update()
 		{
 			// See if actor node has updated and update our transforms here.
 			UpdateTransform();
 		}
+#endif
 	}
 }

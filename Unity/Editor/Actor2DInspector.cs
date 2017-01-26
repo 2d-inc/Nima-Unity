@@ -4,8 +4,8 @@ using UnityEngine;
 
 namespace Nima.Unity.Editor 
 {
-	[CustomEditor(typeof(Actor2D))]
-	public class Actor2DInspector : UnityEditor.Editor 
+	[CustomEditor(typeof(ActorComponent))]
+	public class ActorComponentInspector : UnityEditor.Editor 
 	{
 		void OnEnable () 
 		{
@@ -14,14 +14,17 @@ namespace Nima.Unity.Editor
 			
 		}
 
+		int m_AnimationIndex;
 		public override void OnInspectorGUI() 
 		{
 			if(GUILayout.Button("Reload"))
 			{
-				Actor2D actor2D = serializedObject.targetObject as Actor2D;
-				actor2D.Reload();
+				ActorComponent ActorComponent = serializedObject.targetObject as ActorComponent;
+				ActorComponent.Reload();
 				Debug.Log("REINIT");
 			}
+			string[] options = new string[] {"Cube", "Sphere", "Plane"};
+			m_AnimationIndex = EditorGUILayout.Popup(m_AnimationIndex, options);
 			/*if(testProp == null)
 			{
 				Debug.Log("NULL!?");

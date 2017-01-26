@@ -20,7 +20,7 @@ namespace Nima.Unity
 				Debug.Log("Nima importer - missing texture at path " + texturePath);
 				return null;
 			}
-			textureImporter.textureType = TextureImporterType.Advanced;
+			textureImporter.textureType = TextureImporterType.Default;
 			//textureImporter.textureFormat = TextureImporterFormat.AutomaticTruecolor;
 			textureImporter.mipmapEnabled = false;
 			textureImporter.alphaIsTransparency = true;
@@ -148,7 +148,7 @@ namespace Nima.Unity
 			foreach(Object obj in list)
 			{
 				GameObject go = obj as GameObject;
-				Actor2D actor = go.GetComponent<Actor2D>();
+				ActorComponent actor = go.GetComponent<ActorComponent>();
 				if(actor != null && actor.Asset == actorAsset)
 				{
 					// We found an actor using the asset that got updated. Let's update the game object.
@@ -160,20 +160,20 @@ namespace Nima.Unity
 		[MenuItem("Assets/Nima/Instance Actor", false, 1)]
 		static void InstanceActor () 
 		{
-			foreach (Object obj in Selection.objects) 
+			foreach (object obj in Selection.objects) 
 			{
 				ActorAsset actorAsset = obj as ActorAsset;
 
 				string actorInstanceName = actorAsset.name;
-				GameObject go = new GameObject(actorInstanceName, typeof(Actor2D));
-				go.GetComponent<Actor2D>().SetActorAsset(actorAsset);
+				GameObject go = new GameObject(actorInstanceName, typeof(ActorComponent));
+				go.GetComponent<ActorComponent>().SetActorAsset(actorAsset);
 			}
 		}
 
 		[MenuItem("Assets/Nima/Instance Actor", true, 1)]
 		static bool ValidateInstanceActor () 
 		{
-			foreach (Object o in Selection.objects) 
+			foreach (object o in Selection.objects) 
 			{
 				if (o.GetType() != typeof(ActorAsset))
 				{
