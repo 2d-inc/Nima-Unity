@@ -1,2 +1,3 @@
 *.meta
 *.cs.meta
+.DS_Store
