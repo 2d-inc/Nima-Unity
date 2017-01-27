@@ -1,4 +1,4 @@
-Shader "Nima/Additive"
+Shader "Nima/Normal"
 {
 	Properties
 	{
@@ -15,7 +15,7 @@ Shader "Nima/Additive"
 		}
 		
 		BlendOp Add
-		Blend One One, One One
+		Blend One OneMinusSrcAlpha, One OneMinusSrcAlpha
 
 		Pass
 		{

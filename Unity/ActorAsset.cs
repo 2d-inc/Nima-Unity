@@ -89,7 +89,6 @@ namespace Nima.Unity
 
 		private void InitializeActor()
 		{
-			Debug.Log("REINIT");
 			const float NimaToUnityScale = 0.01f;
 
 			IEnumerable<ActorNode> nodes = m_Actor.Nodes;
@@ -116,6 +115,10 @@ namespace Nima.Unity
 				{
 					m_ImageNodes[imgIdx] = ai;
 					Mesh mesh = new Mesh();
+					if(ai.DoesAnimationVertexDeform)
+					{
+						mesh.MarkDynamic();
+					}
 					m_Meshes[imgIdx] = mesh;
 					imgIdx++;
 
@@ -235,7 +238,32 @@ namespace Nima.Unity
 					mesh.RecalculateNormals();
 
 					// We don't need to hold the geometry data in the node now that it's in our buffers.
-					//ai.DisposeGeometry();
+					ai.DisposeGeometry();
+				}
+			}
+
+			// Find any vertex deform animation keyframes and update them to scale the vertices as is necessary for the skinned path.
+			foreach(Nima.Animation.ActorAnimation animation in m_Actor.Animations)
+			{
+				foreach(Nima.Animation.NodeAnimation nodeAnimation in animation.AnimatedNodes)
+				{
+					ActorNode node = m_Actor[nodeAnimation.NodeIndex];
+					ActorImage actorImage = node as ActorImage;
+					if(actorImage != null && actorImage.ConnectedBoneCount == 0)
+					{
+						// This image is in the hierarchy, no need to transform the vertices.
+						continue;
+					}
+					foreach(Nima.Animation.PropertyAnimation propertyAnimation in nodeAnimation.Properties)
+					{
+						if(propertyAnimation.PropertyType == Nima.Animation.PropertyTypes.VertexDeform)
+						{
+							foreach(Nima.Animation.KeyFrame keyFrame in propertyAnimation.KeyFrames)
+							{
+								(keyFrame as Nima.Animation.KeyFrameVertexDeform).TransformVertices(node.WorldTransform);
+							}
+						}
+					}
 				}
 			}
 		}

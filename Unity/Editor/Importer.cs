@@ -22,8 +22,8 @@ namespace Nima.Unity
 			}
 			textureImporter.textureType = TextureImporterType.Default;
 			//textureImporter.textureFormat = TextureImporterFormat.AutomaticTruecolor;
-			textureImporter.mipmapEnabled = false;
-			textureImporter.alphaIsTransparency = true;
+			textureImporter.mipmapEnabled = true;
+			textureImporter.alphaIsTransparency = false;
 			textureImporter.maxTextureSize = 2048;
 
 			EditorUtility.SetDirty(textureImporter);

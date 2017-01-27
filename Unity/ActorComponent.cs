@@ -12,6 +12,8 @@ namespace Nima.Unity
 	{
 		[SerializeField]
 		private ActorAsset m_ActorAsset;
+		[SerializeField]
+		private int m_RenderQueueOffset;
 
 		private ActorImageComponent[] m_ImageNodes;
 		private ActorNodeComponent[] m_SkinnedBoneNodes;
@@ -32,6 +34,18 @@ namespace Nima.Unity
 			get
 			{
 				return m_DefaultBone;
+			}
+		}
+
+		public int RenderQueueOffset
+		{
+			get
+			{
+				return m_RenderQueueOffset;
+			}
+			set
+			{
+				m_RenderQueueOffset = value;
 			}
 		}
 
@@ -69,6 +83,7 @@ namespace Nima.Unity
 
 		void RemoveNodes()
 		{
+			DestroyImmediate(m_DefaultBone);
 			if(m_SkinnedBoneNodes != null)
 			{
 				foreach(ActorNodeComponent node in m_SkinnedBoneNodes)
@@ -162,6 +177,7 @@ namespace Nima.Unity
 			m_ImageNodes = new ActorImageComponent[m_ActorInstance.ImageNodeCount];
 
 			int imgNodeIdx = 0;
+
 			foreach(ActorImage ai in m_ActorInstance.ImageNodes)
 			{
 				if(ai.VertexCount == 0)
@@ -183,6 +199,18 @@ namespace Nima.Unity
 				ActorImageComponent actorImage = go.GetComponent<ActorImageComponent>();
 				m_ImageNodes[imgNodeIdx] = actorImage;
 
+				if(ai.DoesAnimationVertexDeform)
+ 				{
+ 					// Clone the vertex array if we deform.
+ 					Mesh clonedMesh = new Mesh();
+ 					clonedMesh.vertices = (Vector3[]) mesh.vertices.Clone();
+ 					clonedMesh.uv = mesh.uv;
+ 					clonedMesh.boneWeights = mesh.boneWeights;
+ 					clonedMesh.bindposes = mesh.bindposes;
+ 					clonedMesh.triangles = mesh.triangles;
+ 					clonedMesh.RecalculateNormals();
+ 					mesh = clonedMesh;
+ 				}
 				if(hasBones)
 				{
 					Mesh skinnedMesh = new Mesh();
@@ -227,8 +255,12 @@ namespace Nima.Unity
 						break;
 					}
 					default:
-						material = new Material(material);
+					{
+						Material overrideMaterial = new Material(Shader.Find("Nima/Normal"));
+						overrideMaterial.mainTexture = material.mainTexture;
+						material = overrideMaterial;
 						break;
+					}
 				}
 				
 				renderer.sharedMaterial = material;

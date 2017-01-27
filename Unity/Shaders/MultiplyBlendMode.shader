@@ -58,6 +58,7 @@ Shader "Nima/Multiply"
 			fixed4 ComputeFragment (VertexOutput vertexOutput) : SV_Target
 			{
 				fixed4 color = tex2D(_MainTex, vertexOutput.texcoord) * vertexOutput.color;
+				color *= vertexOutput.color.a;
 				return color;
 			}
 			

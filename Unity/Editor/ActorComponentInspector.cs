@@ -14,17 +14,21 @@ namespace Nima.Unity.Editor
 			
 		}
 
-		int m_AnimationIndex;
 		public override void OnInspectorGUI() 
 		{
+			ActorComponent actor = serializedObject.targetObject as ActorComponent;
 			if(GUILayout.Button("Reload"))
 			{
-				ActorComponent ActorComponent = serializedObject.targetObject as ActorComponent;
-				ActorComponent.Reload();
+				actor.Reload();
 				Debug.Log("REINIT");
 			}
-			string[] options = new string[] {"Cube", "Sphere", "Plane"};
-			m_AnimationIndex = EditorGUILayout.Popup(m_AnimationIndex, options);
+			int order = EditorGUILayout.IntField("Render Queue Offset:", actor.RenderQueueOffset);
+			if(order != actor.RenderQueueOffset)
+			{
+				actor.RenderQueueOffset = order;
+				actor.Reload();
+			}
+
 			/*if(testProp == null)
 			{
 				Debug.Log("NULL!?");

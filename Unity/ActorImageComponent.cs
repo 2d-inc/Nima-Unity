@@ -4,13 +4,14 @@ using UnityEngine;
 
 namespace Nima.Unity
 {
-	[ExecuteInEditMode]
 	public class ActorImageComponent : ActorNodeComponent
 	{
+		private int m_RenderQueueOffset = 0;
 		public override void Initialize(ActorComponent actorComponent, Nima.ActorNode actorNode)
 		{
 			base.Initialize(actorComponent, actorNode);
 
+			m_RenderQueueOffset = actorComponent.RenderQueueOffset;
 			ActorNodeComponent[] actorBones = actorComponent.SkinnedBoneNodes;
 			ActorImage imageNode = m_ActorNode as ActorImage;
 			// Attach the skinned bone nodes to the bones of the skinned renderer.
@@ -45,32 +46,44 @@ namespace Nima.Unity
 			}
 
 			ActorImage imageNode = m_ActorNode as ActorImage;
+			if(imageNode.IsVertexDeformDirty)
+			{
+				Mesh mesh;
+				if(imageNode.IsSkinned)
+				{
+					mesh = GetComponent<SkinnedMeshRenderer>().sharedMesh;
+				}
+				else
+				{
+					MeshFilter meshFilter = GetComponent<MeshFilter>();
+					mesh = meshFilter.sharedMesh;
+				}
 
+				float[] v = imageNode.AnimationDeformedVertices;
+				int l = imageNode.VertexCount;
+				int vi = 0;
+				Vector3[] verts = mesh.vertices;
+				for(int i = 0; i < l; i++)
+				{
+					float x = v[vi++];
+					float y = v[vi++];
+					verts[i] = new Vector3(x, y, 0.0f);
+				}
+				mesh.vertices = verts;
+				imageNode.IsVertexDeformDirty = false;
+			}
 			if(!imageNode.IsSkinned)
 			{
 				base.UpdateTransform();
 			}
 
 			Renderer renderer = gameObject.GetComponent<Renderer>();
-			renderer.sharedMaterial.renderQueue = imageNode.DrawOrder;
-		}
 
-#if UNITY_EDITOR
-		public void Update()
-		{
-			// See if actor node has updated and update our transforms here.
-			UpdateTransform();
-			if(!Application.isPlaying)
+			if(renderer.sharedMaterial.color.a != m_ActorNode.RenderOpacity)
 			{
-				// We are in the editor and not playing, so let's make sure things stay synced.
-				MeshRenderer meshRenderer = gameObject.GetComponent<MeshRenderer>();
-				ActorImage imageNode = m_ActorNode as ActorImage;
-				if(imageNode != null && meshRenderer != null && meshRenderer.sharedMaterial != null)
-				{
-					meshRenderer.sharedMaterial.renderQueue = imageNode.DrawOrder;
-				}
+				renderer.sharedMaterial.color = new Color(1.0f,1.0f,1.0f,m_ActorNode.RenderOpacity);
 			}
+			renderer.sharedMaterial.renderQueue = m_RenderQueueOffset+imageNode.DrawOrder;
 		}
-#endif
 	}
 }
