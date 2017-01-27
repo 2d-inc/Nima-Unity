@@ -12,7 +12,6 @@ namespace Nima.Unity
 			base.Initialize(actorComponent, actorNode);
 
 			ActorNodeComponent[] actorBones = actorComponent.SkinnedBoneNodes;
-
 			ActorImage imageNode = m_ActorNode as ActorImage;
 			// Attach the skinned bone nodes to the bones of the skinned renderer.
 			if(imageNode.IsSkinned)

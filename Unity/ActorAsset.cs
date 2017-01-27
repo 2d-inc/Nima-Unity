@@ -3,26 +3,33 @@ using System.IO;
 using System.Collections.Generic;
 using Nima.Math2D;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Nima.Unity
 {
+	[ExecuteInEditMode]
 	public class ActorAsset : ScriptableObject
 	{
 		[SerializeField]
 		private TextAsset m_RawAsset;
 
+		[NonSerialized]
 		private Nima.Actor m_Actor;
+		[NonSerialized]
 		private Mesh[] m_Meshes;
+		[NonSerialized]
 		private ActorImage[] m_ImageNodes;
-		public Material[] m_TextureMaterials;
 
-		public void OnEnable()
-		{
-			Load();
-		}
+		// Hideous hack. We store a test mesh to detect when Unity decides to null out all meshes for us.
+		// Still not sure why this is happening when we're holding a reference to them, some internal optimization.
+		private Mesh m_TestMesh;
+
+		[SerializeField]
+		public Material[] m_TextureMaterials;
 
 		public bool Load(TextAsset asset)
 		{
+			m_TestMesh = new Mesh();
 			m_RawAsset = asset;
 			using (MemoryStream ms = new MemoryStream(asset.bytes))
 			{
@@ -58,7 +65,7 @@ namespace Nima.Unity
 		{
 			get
 			{
-				return m_Actor != null;
+				return m_Actor != null && m_TestMesh != null;
 			}
 		}
 
@@ -82,6 +89,7 @@ namespace Nima.Unity
 
 		private void InitializeActor()
 		{
+			Debug.Log("REINIT");
 			const float NimaToUnityScale = 0.01f;
 
 			IEnumerable<ActorNode> nodes = m_Actor.Nodes;
@@ -107,7 +115,6 @@ namespace Nima.Unity
 				if(ai != null)
 				{
 					m_ImageNodes[imgIdx] = ai;
-
 					Mesh mesh = new Mesh();
 					m_Meshes[imgIdx] = mesh;
 					imgIdx++;

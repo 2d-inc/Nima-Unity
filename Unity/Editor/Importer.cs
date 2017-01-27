@@ -66,6 +66,7 @@ namespace Nima.Unity
 						ActorAsset actorAsset = (ActorAsset)AssetDatabase.LoadAssetAtPath(assetPath, typeof(ActorAsset));
 						if(actorAsset != null)
 						{
+							Debug.Log("RELOADING ACTOR ASSET");
 							// If the load succeeds, update the GameObjects that are referencing this asset.
 							if(actorAsset.Load(rawAsset))
 							{
@@ -76,6 +77,7 @@ namespace Nima.Unity
 						}
 						else
 						{
+							Debug.Log("LOADING ACTOR ASSET");
 							actorAsset = ScriptableObject.CreateInstance<ActorAsset>();
 							if(actorAsset.Load(rawAsset))
 							{
@@ -151,6 +153,7 @@ namespace Nima.Unity
 				ActorComponent actor = go.GetComponent<ActorComponent>();
 				if(actor != null && actor.Asset == actorAsset)
 				{
+					Debug.Log("FOUND ACTOR WITH UPDATED ASSET");
 					// We found an actor using the asset that got updated. Let's update the game object.
 					actor.InitializeFromAsset(actorAsset);
 				}
