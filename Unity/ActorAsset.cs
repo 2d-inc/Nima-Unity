@@ -86,11 +86,11 @@ namespace Nima.Unity
 		{
 			return m_TextureMaterials[idx];
 		}
+		
+		public const float NimaToUnityScale = 0.01f;
 
 		private void InitializeActor()
 		{
-			const float NimaToUnityScale = 0.01f;
-
 			IEnumerable<ActorNode> nodes = m_Actor.Nodes;
 			m_Actor.Root.ScaleX = NimaToUnityScale;
 			m_Actor.Root.ScaleY = NimaToUnityScale;

@@ -5,7 +5,7 @@ using Nima.Math2D;
 
 namespace Nima.Unity
 {
-	public class Play2DAnimation : MonoBehaviour
+	public class PlayActorAnimation : MonoBehaviour
 	{
 		[SerializeField]
 		private string m_AnimationName;

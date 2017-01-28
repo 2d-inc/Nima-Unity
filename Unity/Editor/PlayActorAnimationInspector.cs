@@ -5,8 +5,8 @@ using System.Collections.Generic;
 
 namespace Nima.Unity.Editor 
 {
-	[CustomEditor(typeof(Play2DAnimation))]
-	public class Play2DAnimationInspector : UnityEditor.Editor 
+	[CustomEditor(typeof(PlayActorAnimation))]
+	public class PlayActorAnimationInspector : UnityEditor.Editor 
 	{
 		ActorComponent m_Actor;
 		string[] m_AnimationNames;
@@ -20,26 +20,20 @@ namespace Nima.Unity.Editor
 		{
 			int animationIndex = 0;
 			bool animationLoop = false;
-			Play2DAnimation play2DAnimation = target as Play2DAnimation;
-			if(play2DAnimation != null)
+			PlayActorAnimation playActorAnimation = target as PlayActorAnimation;
+			if(playActorAnimation != null)
 			{
-				//Debug.Log("OBJ NOT NULL");
-				m_Actor = play2DAnimation.GetComponent<ActorComponent>();
+				m_Actor = playActorAnimation.GetComponent<ActorComponent>();
 				List<string> names = new List<string>();
 				if(m_Actor != null && m_Actor.ActorInstance != null)
 				{
-				//	Debug.Log("GOT ACTOR");
-					if(m_Actor.ActorInstance == null)
-					{
-				//		Debug.Log("GOT ACTOR NULL");
-					}
 					foreach(Nima.Animation.ActorAnimation animation in m_Actor.ActorInstance.Animations)
 					{
 						names.Add(animation.Name);
 					}
 					m_AnimationNames = names.ToArray();
-					animationIndex = names.IndexOf(play2DAnimation.AnimationName);
-					animationLoop = play2DAnimation.Loop;
+					animationIndex = names.IndexOf(playActorAnimation.AnimationName);
+					animationLoop = playActorAnimation.Loop;
 				}
 				else
 				{
@@ -56,12 +50,12 @@ namespace Nima.Unity.Editor
 				int idx = EditorGUILayout.Popup(animationIndex, m_AnimationNames);
 				if(idx != animationIndex)
 				{
-					play2DAnimation.AnimationName = m_AnimationNames[idx];
+					playActorAnimation.AnimationName = m_AnimationNames[idx];
 				}
 				bool loop = EditorGUILayout.Toggle("Loop", animationLoop);
 				if(loop != animationLoop)
 				{
-					play2DAnimation.Loop = loop;
+					playActorAnimation.Loop = loop;
 				}
 			}
 			/*if(testProp == null)

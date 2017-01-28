@@ -15,17 +15,18 @@ namespace Nima.Unity
 		[SerializeField]
 		private int m_RenderQueueOffset;
 
-		private ActorImageComponent[] m_ImageNodes;
-		private ActorNodeComponent[] m_SkinnedBoneNodes;
+		private ActorNodeComponent[] m_Nodes;
+		//private ActorImageComponent[] m_ImageNodes;
+		//private ActorNodeComponent[] m_SkinnedBoneNodes;
 		private GameObject m_DefaultBone;
 
 		private Actor m_ActorInstance;
 
-		public ActorNodeComponent[] SkinnedBoneNodes
+		public ActorNodeComponent[] Nodes
 		{
 			get
 			{
-				return m_SkinnedBoneNodes;
+				return m_Nodes;
 			}
 		}
 
@@ -84,27 +85,9 @@ namespace Nima.Unity
 		void RemoveNodes()
 		{
 			DestroyImmediate(m_DefaultBone);
-			if(m_SkinnedBoneNodes != null)
+			if(m_Nodes != null)
 			{
-				foreach(ActorNodeComponent node in m_SkinnedBoneNodes)
-				{
-					if(node == null)
-					{
-						continue;
-					}
-					if(node.gameObject != null)
-					{
-						DestroyImmediate(node.gameObject);
-					}
-					else
-					{
-						DestroyImmediate(node);
-					}
-				}
-			}
-			if(m_ImageNodes != null)
-			{
-				foreach(ActorImageComponent node in m_ImageNodes)
+				foreach(ActorNodeComponent node in m_Nodes)
 				{
 					if(node == null)
 					{
@@ -147,34 +130,119 @@ namespace Nima.Unity
 			
 			// Instance actor bones first as our image nodes need to know about them if they are skinned.
 			{
-				IEnumerable<ActorNode> nodes = m_ActorInstance.Nodes;
-				List<ActorBone> skinnedBones = new List<ActorBone>();
-				foreach(ActorNode node in nodes)
-				{
-					ActorBone ab = node as ActorBone;
-					if(ab != null && ab.IsConnectedToImage)
-					{
-						skinnedBones.Add(ab);
-					}
-				}
-				
-				m_SkinnedBoneNodes = new ActorNodeComponent[skinnedBones.Count];
+				ActorNode[] allNodes = m_ActorInstance.AllNodes;
+				m_Nodes = new ActorNodeComponent[allNodes.Length];
 				m_DefaultBone = new GameObject("Default Bone");
 				m_DefaultBone.transform.parent = gameObject.transform;
 				m_DefaultBone.hideFlags = hideFlags; //HideFlags.HideInHierarchy | HideFlags.HideInInspector;
-				for(int i = 0; i < skinnedBones.Count; i++)
+				
+				int imgNodeIdx = 0;
+				for(int i = 0; i < allNodes.Length; i++)
 				{
-					ActorBone ab = skinnedBones[i];
+					ActorNode an = allNodes[i];
+					GameObject go;
+					ActorImage ai = an as ActorImage;
+					if(ai != null)
+					{
+						if(ai.VertexCount == 0)
+						{
+							go = new GameObject(an.Name, typeof(ActorNodeComponent));
+						}
+						else
+						{
+							Mesh mesh = m_ActorAsset.GetMesh(imgNodeIdx);
+							bool hasBones = ai.ConnectedBoneCount > 0;
 
-					GameObject go = new GameObject(ab.Name, typeof(ActorNodeComponent));
-					go.hideFlags = hideFlags;// | HideFlags.HideInHierarchy | HideFlags.HideInInspector;
-					go.transform.parent = gameObject.transform;
-					m_SkinnedBoneNodes[i] = go.GetComponent<ActorNodeComponent>();
-					m_SkinnedBoneNodes[i].Initialize(this, ab);
+							go = hasBones ? 
+											new GameObject(ai.Name, typeof(SkinnedMeshRenderer), typeof(ActorImageComponent)) : 
+											new GameObject(ai.Name, typeof(MeshFilter), typeof(MeshRenderer), typeof(ActorImageComponent));
+
+							ActorImageComponent actorImage = go.GetComponent<ActorImageComponent>();
+							if(ai.DoesAnimationVertexDeform)
+			 				{
+			 					// Clone the vertex array if we deform.
+			 					Mesh clonedMesh = new Mesh();
+			 					clonedMesh.vertices = (Vector3[]) mesh.vertices.Clone();
+			 					clonedMesh.uv = mesh.uv;
+			 					clonedMesh.boneWeights = mesh.boneWeights;
+			 					clonedMesh.bindposes = mesh.bindposes;
+			 					clonedMesh.triangles = mesh.triangles;
+			 					clonedMesh.RecalculateNormals();
+			 					mesh = clonedMesh;
+			 				}
+							if(hasBones)
+							{
+								Mesh skinnedMesh = new Mesh();
+			 					skinnedMesh.vertices = mesh.vertices;
+			 					skinnedMesh.uv = mesh.uv;
+			 					skinnedMesh.boneWeights = mesh.boneWeights;
+			 					skinnedMesh.triangles = mesh.triangles;
+			 					skinnedMesh.bindposes = mesh.bindposes;
+			 
+			 					go.GetComponent<SkinnedMeshRenderer>().sharedMesh = skinnedMesh;
+							}
+							else
+							{
+								MeshFilter meshFilter = go.GetComponent<MeshFilter>();
+								meshFilter.sharedMesh = mesh;
+							}
+
+							Renderer renderer = go.GetComponent<Renderer>();
+
+							Material material = m_ActorAsset.GetMaterial(ai.TextureIndex);
+							switch(ai.BlendMode)
+							{
+								case BlendModes.Screen:
+								{
+									Material overrideMaterial = new Material(Shader.Find("Nima/Screen"));
+									overrideMaterial.mainTexture = material.mainTexture;
+									material = overrideMaterial;
+									break;
+								}
+								case BlendModes.Additive:
+								{
+									Material overrideMaterial = new Material(Shader.Find("Nima/Additive"));
+									overrideMaterial.mainTexture = material.mainTexture;
+									material = overrideMaterial;
+									break;
+								}
+								case BlendModes.Multiply:
+								{
+									Material overrideMaterial = new Material(Shader.Find("Nima/Multiply"));
+									overrideMaterial.mainTexture = material.mainTexture;
+									material = overrideMaterial;
+									break;
+								}
+								default:
+								{
+									Material overrideMaterial = new Material(Shader.Find("Nima/Normal"));
+									overrideMaterial.mainTexture = material.mainTexture;
+									material = overrideMaterial;
+									break;
+								}
+							}
+							
+							renderer.sharedMaterial = material;
+						}
+						imgNodeIdx++;
+					}
+					else
+					{
+						go = new GameObject(an.Name, typeof(ActorNodeComponent));
+					}
+					
+					go.hideFlags = hideFlags;
+					m_Nodes[i] = go.GetComponent<ActorNodeComponent>();
+				}
+
+				// After they are all created, initialize them.
+				for(int i = 0; i < allNodes.Length; i++)
+				{
+					m_Nodes[i].Initialize(this, allNodes[i]);
 				}
 			}
 
-			m_ImageNodes = new ActorImageComponent[m_ActorInstance.ImageNodeCount];
+			/*m_ImageNodes = new ActorImageComponent[m_ActorInstance.ImageNodeCount];
 
 			int imgNodeIdx = 0;
 
@@ -267,7 +335,7 @@ namespace Nima.Unity
 
 				actorImage.Initialize(this, ai);
 				imgNodeIdx++;
-			}
+			}*/
 #if UNITY_EDITOR
 			UpdateEditorBounds();
 #endif
@@ -363,27 +431,16 @@ namespace Nima.Unity
 			}
 		}*/
 
-		public void Update()
+		public void LateUpdate()
 		{
 			if(m_ActorInstance != null)
 			{
 				m_ActorInstance.Advance(Time.deltaTime);
 			}
 			
-			if(m_SkinnedBoneNodes != null)
+			if(m_Nodes != null)
 			{
-				foreach(ActorNodeComponent node in m_SkinnedBoneNodes)
-				{
-					if(node == null)
-					{
-						continue;
-					}
-					node.UpdateTransform();
-				}
-			}
-			if(m_ImageNodes != null)
-			{
-				foreach(ActorImageComponent node in m_ImageNodes)
+				foreach(ActorNodeComponent node in m_Nodes)
 				{
 					if(node == null)
 					{

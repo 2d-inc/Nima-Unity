@@ -12,7 +12,7 @@ namespace Nima.Unity
 			base.Initialize(actorComponent, actorNode);
 
 			m_RenderQueueOffset = actorComponent.RenderQueueOffset;
-			ActorNodeComponent[] actorBones = actorComponent.SkinnedBoneNodes;
+
 			ActorImage imageNode = m_ActorNode as ActorImage;
 			// Attach the skinned bone nodes to the bones of the skinned renderer.
 			if(imageNode.IsSkinned)
@@ -24,14 +24,8 @@ namespace Nima.Unity
 				int idx = 1;
 				foreach(ActorImage.BoneConnection bc in imageNode.BoneConnections)
 				{
-					foreach(ActorNodeComponent ab in actorBones)
-					{
-						if(ab.Node == bc.Node)
-						{
-							transforms[idx] = ab.transform;
-							break;
-						}
-					}
+					ActorNodeComponent boneComponent = actorComponent.Nodes[bc.m_BoneIdx];
+					transforms[idx] = boneComponent.gameObject.transform;
 					idx++;
 				}
 				skinnedRenderer.bones = transforms;
