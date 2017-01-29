@@ -113,7 +113,7 @@ namespace Nima.Unity
 
 		public void InitializeFromAsset(ActorAsset actorAsset)
 		{
-			HideFlags hideFlags = HideFlags.DontSaveInEditor | HideFlags.DontSaveInBuild | HideFlags.DontUnloadUnusedAsset;
+			HideFlags hideFlags = HideFlags.DontSaveInEditor | HideFlags.DontSaveInBuild | HideFlags.DontUnloadUnusedAsset | HideFlags.HideInHierarchy | HideFlags.HideInInspector;
 
 			m_ActorAsset = actorAsset;
 
@@ -134,7 +134,7 @@ namespace Nima.Unity
 				m_Nodes = new ActorNodeComponent[allNodes.Length];
 				m_DefaultBone = new GameObject("Default Bone");
 				m_DefaultBone.transform.parent = gameObject.transform;
-				m_DefaultBone.hideFlags = hideFlags; //HideFlags.HideInHierarchy | HideFlags.HideInInspector;
+				m_DefaultBone.hideFlags = hideFlags;
 				
 				int imgNodeIdx = 0;
 				for(int i = 0; i < allNodes.Length; i++)
@@ -241,101 +241,6 @@ namespace Nima.Unity
 					m_Nodes[i].Initialize(this, allNodes[i]);
 				}
 			}
-
-			/*m_ImageNodes = new ActorImageComponent[m_ActorInstance.ImageNodeCount];
-
-			int imgNodeIdx = 0;
-
-			foreach(ActorImage ai in m_ActorInstance.ImageNodes)
-			{
-				if(ai.VertexCount == 0)
-				{
-					imgNodeIdx++;
-					continue;
-				}
-				Mesh mesh = m_ActorAsset.GetMesh(imgNodeIdx);
-				bool hasBones = ai.ConnectedBoneCount > 0;
-
-				GameObject go = hasBones ? 
-									new GameObject(ai.Name, typeof(SkinnedMeshRenderer), typeof(ActorImageComponent)) : 
-									new GameObject(ai.Name, typeof(MeshFilter), typeof(MeshRenderer), typeof(ActorImageComponent));
-				//go.hideFlags = hideFlags;//hideFlags;
-				go.hideFlags = hideFlags;// | HideFlags.HideInHierarchy | HideFlags.HideInInspector;//hideFlags;
-
-				go.transform.parent = gameObject.transform;//m_Root.transform;
-
-				ActorImageComponent actorImage = go.GetComponent<ActorImageComponent>();
-				m_ImageNodes[imgNodeIdx] = actorImage;
-
-				if(ai.DoesAnimationVertexDeform)
- 				{
- 					// Clone the vertex array if we deform.
- 					Mesh clonedMesh = new Mesh();
- 					clonedMesh.vertices = (Vector3[]) mesh.vertices.Clone();
- 					clonedMesh.uv = mesh.uv;
- 					clonedMesh.boneWeights = mesh.boneWeights;
- 					clonedMesh.bindposes = mesh.bindposes;
- 					clonedMesh.triangles = mesh.triangles;
- 					clonedMesh.RecalculateNormals();
- 					mesh = clonedMesh;
- 				}
-				if(hasBones)
-				{
-					Mesh skinnedMesh = new Mesh();
- 					skinnedMesh.vertices = mesh.vertices;
- 					skinnedMesh.uv = mesh.uv;
- 					skinnedMesh.boneWeights = mesh.boneWeights;
- 					skinnedMesh.triangles = mesh.triangles;
- 					skinnedMesh.bindposes = mesh.bindposes;
- 
- 					go.GetComponent<SkinnedMeshRenderer>().sharedMesh = skinnedMesh;
-				}
-				else
-				{
-					MeshFilter meshFilter = go.GetComponent<MeshFilter>();
-					meshFilter.sharedMesh = mesh;
-				}
-
-				Renderer renderer = go.GetComponent<Renderer>();
-
-				Material material = m_ActorAsset.GetMaterial(ai.TextureIndex);
-				switch(ai.BlendMode)
-				{
-					case BlendModes.Screen:
-					{
-						Material overrideMaterial = new Material(Shader.Find("Nima/Screen"));
-						overrideMaterial.mainTexture = material.mainTexture;
-						material = overrideMaterial;
-						break;
-					}
-					case BlendModes.Additive:
-					{
-						Material overrideMaterial = new Material(Shader.Find("Nima/Additive"));
-						overrideMaterial.mainTexture = material.mainTexture;
-						material = overrideMaterial;
-						break;
-					}
-					case BlendModes.Multiply:
-					{
-						Material overrideMaterial = new Material(Shader.Find("Nima/Multiply"));
-						overrideMaterial.mainTexture = material.mainTexture;
-						material = overrideMaterial;
-						break;
-					}
-					default:
-					{
-						Material overrideMaterial = new Material(Shader.Find("Nima/Normal"));
-						overrideMaterial.mainTexture = material.mainTexture;
-						material = overrideMaterial;
-						break;
-					}
-				}
-				
-				renderer.sharedMaterial = material;
-
-				actorImage.Initialize(this, ai);
-				imgNodeIdx++;
-			}*/
 #if UNITY_EDITOR
 			UpdateEditorBounds();
 #endif
@@ -391,6 +296,11 @@ namespace Nima.Unity
 			{
 				return m_ActorAsset;
 			}
+			set
+			{
+				m_ActorAsset = value;
+				Reload();
+			}
 		}
 
 		public Nima.Actor ActorInstance
@@ -400,36 +310,6 @@ namespace Nima.Unity
 				return m_ActorInstance;
 			}
 		}
-
-		/*public void TestUpdate()
-		{
-			m_TestAnimationTime += 0.01f;//Time.deltaTime*0.1f;
-			if(m_TestAnimationTime > 1.82f)
-			{
-				m_TestAnimationTime = 0.0f;
-			}
-			//m_TestAnimationTime = 19.0f/60.0f;
-			if(m_TestAnimation != null)
-			{
-				m_TestAnimation.Apply(m_TestAnimationTime, m_ActorInstance.AllNodes, 1.0f);
-				foreach(ActorNodeComponent n in m_SkinnedBoneNodes)
-				{
-					if(n == null)
-					{
-						continue;
-					}
-					n.Update();
-				}
-				foreach(ActorImageComponent n in m_ImageNodes)
-				{
-					if(n == null)
-					{
-						continue;
-					}
-					n.Update();
-				}
-			}
-		}*/
 
 		public void LateUpdate()
 		{
