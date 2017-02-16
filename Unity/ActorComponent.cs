@@ -130,16 +130,22 @@ namespace Nima.Unity
 			
 			// Instance actor bones first as our image nodes need to know about them if they are skinned.
 			{
-				ActorNode[] allNodes = m_ActorInstance.AllNodes;
-				m_Nodes = new ActorNodeComponent[allNodes.Length];
+				//ActorNode[] allNodes = m_ActorInstance.AllNodes;
+				IList<Nima.ActorComponent> actorComponents = m_ActorInstance.Components;
+				m_Nodes = new ActorNodeComponent[actorComponents.Count];
 				m_DefaultBone = new GameObject("Default Bone");
 				m_DefaultBone.transform.parent = gameObject.transform;
 				m_DefaultBone.hideFlags = hideFlags;
 				
 				int imgNodeIdx = 0;
-				for(int i = 0; i < allNodes.Length; i++)
+				for(int i = 0; i < actorComponents.Count; i++)
 				{
-					ActorNode an = allNodes[i];
+					Nima.ActorComponent ac = actorComponents[i];
+					ActorNode an = ac as ActorNode;
+					if(an == null)
+					{
+						continue;
+					}
 					GameObject go;
 					ActorImage ai = an as ActorImage;
 					if(ai != null)
@@ -236,9 +242,13 @@ namespace Nima.Unity
 				}
 
 				// After they are all created, initialize them.
-				for(int i = 0; i < allNodes.Length; i++)
+				for(int i = 0; i < m_Nodes.Length; i++)
 				{
-					m_Nodes[i].Initialize(this, allNodes[i]);
+					ActorNodeComponent nodeComponent = m_Nodes[i];
+					if(nodeComponent != null)
+					{
+						nodeComponent.Initialize(this, actorComponents[i] as ActorNode);	
+					}
 				}
 			}
 #if UNITY_EDITOR
