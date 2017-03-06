@@ -233,7 +233,7 @@ namespace Nima.Unity
 			AssetDatabase.SaveAssets();
 		}
 
-		[MenuItem("Assets/Nima/Instance Actor", true, 1)]
+		[MenuItem("Assets/Nima/Make Mecanim Controller", true, 1)]
 		static bool ValidateMakeMecanimController() 
 		{
 			foreach (object o in Selection.objects) 
