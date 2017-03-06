@@ -245,6 +245,10 @@ namespace Nima.Unity
 			// Find any vertex deform animation keyframes and update them to scale the vertices as is necessary for the skinned path.
 			foreach(Nima.Animation.ActorAnimation animation in m_Actor.Animations)
 			{
+				if(animation == null || animation.AnimatedComponents == null)
+				{
+					continue;
+				}
 				foreach(Nima.Animation.ComponentAnimation componentAnimation in animation.AnimatedComponents)
 				{
 					ActorNode node = m_Actor[componentAnimation.ComponentIndex] as ActorNode;

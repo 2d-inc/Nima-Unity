@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEditor;
 using System.IO;
+using System.Collections.Generic;
 
 namespace Nima.Unity
 {
@@ -184,6 +185,121 @@ namespace Nima.Unity
 				}
 			}
 			return true;
+		}
+
+		[MenuItem("Assets/Nima/Make Mecanim Controller", false, 1)]
+		static void MakeMecanimController() 
+		{
+			foreach (object obj in Selection.objects) 
+			{
+				ActorAsset actorAsset = obj as ActorAsset;
+				string actorPath = AssetDatabase.GetAssetPath(actorAsset);
+				actorPath = actorPath.Replace(".asset", "");
+				Debug.Log("Actor Path " + actorPath);
+				int idx = 0;
+				string filename = null;
+				while (true) 
+				{
+					filename = idx == 0 ? actorPath + ".controller" : actorPath + "_" + idx + ".controller";
+					if(!File.Exists(filename))
+					{
+						break;
+					}
+					idx++;
+				}
+
+				UnityEditor.Animations.AnimatorController animatorController = UnityEditor.Animations.AnimatorController.CreateAnimatorControllerAtPath(filename) as UnityEditor.Animations.AnimatorController;
+				if(!actorAsset.Loaded)
+				{
+					actorAsset.Load();
+				}
+				Nima.Actor actor = actorAsset.Actor;
+				foreach(Nima.Animation.ActorAnimation actorAnimation in actor.Animations)
+				{
+					AnimationClip animationClip = new AnimationClip();
+					animationClip.name = actorAnimation.Name;
+					AnimationClipSettings clipSettings = AnimationUtility.GetAnimationClipSettings(animationClip);
+					clipSettings.stopTime = actorAnimation.Duration;
+					clipSettings.loopTime = actorAnimation.IsLooping;
+					AnimationUtility.SetAnimationClipSettings(animationClip, clipSettings);
+
+					AssetDatabase.AddObjectToAsset(animationClip, animatorController);
+
+					EditorUtility.SetDirty(animationClip);
+				}
+			}
+
+			AssetDatabase.Refresh();
+			AssetDatabase.SaveAssets();
+		}
+
+		[MenuItem("Assets/Nima/Instance Actor", true, 1)]
+		static bool ValidateMakeMecanimController() 
+		{
+			foreach (object o in Selection.objects) 
+			{
+				if (o.GetType() != typeof(ActorAsset))
+				{
+					return false;
+				}
+			}
+			return true;
+		}
+
+		public static void ReloadMecanimController(ActorComponent actorComponent, UnityEditor.Animations.AnimatorController animatorController)
+		{
+			Nima.Actor actor = actorComponent.Asset.Actor;
+
+			string path = AssetDatabase.GetAssetPath(animatorController);
+
+			UnityEngine.Object[] assets = AssetDatabase.LoadAllAssetsAtPath(path);
+			
+			List<Nima.Animation.ActorAnimation> alreadyUsedAnimations = new List<Nima.Animation.ActorAnimation>();
+
+			foreach(UnityEngine.Object asset in assets)
+			{
+				AnimationClip clip = asset as AnimationClip;
+				if(clip == null)
+				{
+					continue;
+				}
+
+				bool exists = false;
+				foreach(Nima.Animation.ActorAnimation actorAnimation in actor.Animations)
+				{
+					if(actorAnimation.Name == clip.name)
+					{
+						exists = true;
+						alreadyUsedAnimations.Add(actorAnimation);
+						break;
+					}
+				}
+				if(!exists)
+				{
+					AnimationClip.DestroyImmediate(clip, true);
+				}
+			}
+
+			foreach(Nima.Animation.ActorAnimation actorAnimation in actor.Animations)
+			{
+				if(alreadyUsedAnimations.IndexOf(actorAnimation) == -1)
+				{
+					AnimationClip animationClip = new AnimationClip();
+					animationClip.name = actorAnimation.Name;
+					AnimationClipSettings clipSettings = AnimationUtility.GetAnimationClipSettings(animationClip);
+					clipSettings.stopTime = actorAnimation.Duration;
+					clipSettings.loopTime = actorAnimation.IsLooping;
+					AnimationUtility.SetAnimationClipSettings(animationClip, clipSettings);
+
+					AssetDatabase.AddObjectToAsset(animationClip, animatorController);
+
+					EditorUtility.SetDirty(animationClip);
+				}
+			}
+
+			EditorUtility.SetDirty(animatorController);
+			AssetDatabase.Refresh();
+			AssetDatabase.SaveAssets();
 		}
 	}
 }

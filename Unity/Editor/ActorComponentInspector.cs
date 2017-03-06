@@ -24,12 +24,26 @@ namespace Nima.Unity.Editor
 			if(GUILayout.Button("Reload"))
 			{
 				actor.Reload();
+				Animator animator = actor.gameObject.GetComponent<Animator>();
+				if(animator != null && animator.runtimeAnimatorController as UnityEditor.Animations.AnimatorController != null)
+				{
+					Importer.ReloadMecanimController(actor, animator.runtimeAnimatorController as UnityEditor.Animations.AnimatorController);
+				}
 			}
 			int order = EditorGUILayout.IntField("Render Queue Offset:", actor.RenderQueueOffset);
 			if(order != actor.RenderQueueOffset)
 			{
 				actor.RenderQueueOffset = order;
 				actor.Reload();
+			}
+			ActorMecanimComponent actorMecanim = actor.gameObject.GetComponent<ActorMecanimComponent>();
+			if(actorMecanim == null)
+			{
+				if(GUILayout.Button("Add Mecanim Components"))
+				{
+					Animator animatorComponent = actor.gameObject.AddComponent( typeof(Animator) ) as Animator;
+					ActorMecanimComponent mecanimComponent = actor.gameObject.AddComponent( typeof(ActorMecanimComponent) ) as ActorMecanimComponent;
+				}
 			}
 		}
 	}
