@@ -1,6 +1,8 @@
 using System;
 using UnityEditor;
 using UnityEngine;
+using UnityEditorInternal;
+using System.Reflection;
 
 namespace Nima.Unity.Editor 
 {
@@ -30,12 +32,56 @@ namespace Nima.Unity.Editor
 					Importer.ReloadMecanimController(actor, animator.runtimeAnimatorController as UnityEditor.Animations.AnimatorController);
 				}
 			}
-			int order = EditorGUILayout.IntField("Render Queue Offset:", actor.RenderQueueOffset);
-			if(order != actor.RenderQueueOffset)
+			
+			PropertyInfo sortingLayersProperty = typeof(InternalEditorUtility).GetProperty("sortingLayerNames", BindingFlags.Static | BindingFlags.NonPublic);
+        	string[] sortLayerNames = (string[])sortingLayersProperty.GetValue(null, new object[0]);
+
+        	PropertyInfo sortingLayerUniqueIDsProperty = typeof(InternalEditorUtility).GetProperty("sortingLayerUniqueIDs", BindingFlags.Static | BindingFlags.NonPublic);
+        	int[] sortLayerIds = (int[])sortingLayerUniqueIDsProperty.GetValue(null, new object[0]);
+
+
+			int currentlySelectedIndex = -1;
+			for(int i = 0 ; i < sortLayerIds.Length ; i++)
 			{
-				actor.RenderQueueOffset = order;
+				if(actor.SortingLayerID == sortLayerIds[i])
+				{
+				    currentlySelectedIndex = i;
+				}
+			}
+
+			int displaySelectedIndex = currentlySelectedIndex;
+			if(displaySelectedIndex == -1)
+			{
+				// Find default layer.
+				for(int i = 0 ; i < sortLayerIds.Length ; i++)
+				{
+					if(sortLayerIds[i] == 0)
+					{
+						displaySelectedIndex = i;
+					}
+				}
+			}
+
+			bool reload = false;
+        	int selectedIndex = EditorGUILayout.Popup("Sorting Layer", displaySelectedIndex, sortLayerNames);
+        	if(selectedIndex != currentlySelectedIndex)
+        	{
+        		actor.SortingLayerID = sortLayerIds[selectedIndex];
+				reload = true;
+        	}
+
+			int order = EditorGUILayout.IntField("Order in Layer", actor.SortingOrder);
+			if(order != actor.SortingOrder)
+			{
+				actor.SortingOrder = order;
+				reload = true;
+			}
+
+			if(reload)
+			{
 				actor.Reload();
 			}
+
 			ActorMecanimComponent actorMecanim = actor.gameObject.GetComponent<ActorMecanimComponent>();
 			if(actorMecanim == null)
 			{

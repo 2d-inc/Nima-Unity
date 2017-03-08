@@ -130,6 +130,8 @@ namespace Nima.Unity
 
 					Vector3[] vertices = new Vector3[aiVertexCount];
 					Vector2[] uvs = new Vector2[aiVertexCount];
+					Color[] colors = new Color[aiVertexCount];
+
 					if(aiVertexStride == 12)
 					{
 						// We have bone weights.
@@ -153,6 +155,7 @@ namespace Nima.Unity
 							vertices[j] = new Vector3(wt[0] * x + wt[2] * y + wt[4], wt[1] * x + wt[3] * y + wt[5], 0.0f);
 
 							uvs[j] = new Vector2(vertexBuffer[idx+aiUVOffset], 1.0f-vertexBuffer[idx+aiUVOffset+1]);
+							colors[j] = new Vector4(1.0f, 1.0f, 1.0f, ai.RenderOpacity);
 
 							BoneWeight weight = new BoneWeight();
 							weight.boneIndex0 = (int)vertexBuffer[idx+aiVertexBoneIndexOffset];
@@ -212,6 +215,7 @@ namespace Nima.Unity
 						{
 							vertices[j] = new Vector3(vertexBuffer[idx+aiPositionOffset], vertexBuffer[idx+aiPositionOffset+1], 0);
 							uvs[j] = new Vector2(vertexBuffer[idx+aiUVOffset], 1.0f-vertexBuffer[idx+aiUVOffset+1]);
+							colors[j] = new Vector4(1.0f, 1.0f, 1.0f, ai.RenderOpacity);
 
 							idx += aiVertexStride;
 						}
@@ -234,6 +238,7 @@ namespace Nima.Unity
 					}
 
 					mesh.triangles = tris;
+					mesh.colors = colors;
 					mesh.RecalculateBounds();
 					mesh.RecalculateNormals();
 

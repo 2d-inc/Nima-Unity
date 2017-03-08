@@ -6,12 +6,14 @@ namespace Nima.Unity
 {
 	public class ActorImageComponent : ActorNodeComponent
 	{
-		private int m_RenderQueueOffset = 0;
+		private int m_SortingOrderOffset = 0;
+		private Mesh m_Mesh;
+
 		public override void Initialize(ActorComponent actorComponent, Nima.ActorNode actorNode)
 		{
 			base.Initialize(actorComponent, actorNode);
 
-			m_RenderQueueOffset = actorComponent.RenderQueueOffset;
+			m_SortingOrderOffset = actorComponent.SortingOrder;
 
 			ActorImage imageNode = m_ActorNode as ActorImage;
 			// Attach the skinned bone nodes to the bones of the skinned renderer.
@@ -32,9 +34,22 @@ namespace Nima.Unity
 			}
 		}
 
+		void Start() 
+		{
+			ActorImage imageNode = m_ActorNode as ActorImage;
+			if(imageNode.IsSkinned)
+			{
+				m_Mesh = GetComponent<SkinnedMeshRenderer>().sharedMesh;
+			}
+			else
+			{
+				m_Mesh = GetComponent<MeshFilter>().sharedMesh;
+			}
+		}
+
 		public override void UpdateTransform()
 		{
-			if(m_ActorNode == null)
+			if(m_ActorNode == null || m_Mesh == null)
 			{
 				return;
 			}
@@ -42,28 +57,17 @@ namespace Nima.Unity
 			ActorImage imageNode = m_ActorNode as ActorImage;
 			if(imageNode.IsVertexDeformDirty)
 			{
-				Mesh mesh;
-				if(imageNode.IsSkinned)
-				{
-					mesh = GetComponent<SkinnedMeshRenderer>().sharedMesh;
-				}
-				else
-				{
-					MeshFilter meshFilter = GetComponent<MeshFilter>();
-					mesh = meshFilter.sharedMesh;
-				}
-
 				float[] v = imageNode.AnimationDeformedVertices;
 				int l = imageNode.VertexCount;
 				int vi = 0;
-				Vector3[] verts = mesh.vertices;
+				Vector3[] verts = m_Mesh.vertices;
 				for(int i = 0; i < l; i++)
 				{
 					float x = v[vi++];
 					float y = v[vi++];
 					verts[i] = new Vector3(x, y, 0.0f);
 				}
-				mesh.vertices = verts;
+				m_Mesh.vertices = verts;
 				imageNode.IsVertexDeformDirty = false;
 			}
 			if(!imageNode.IsSkinned)
@@ -73,11 +77,19 @@ namespace Nima.Unity
 
 			Renderer renderer = gameObject.GetComponent<Renderer>();
 
-			if(renderer.sharedMaterial.color.a != m_ActorNode.RenderOpacity)
+
+			if(m_Mesh.colors[0].a != m_ActorNode.RenderOpacity)
 			{
-				renderer.sharedMaterial.color = new Color(1.0f,1.0f,1.0f,m_ActorNode.RenderOpacity);
+				Color[] colors = new Color[m_Mesh.colors.Length];
+				for(int i = 0; i < m_Mesh.colors.Length; i++)
+				{
+					colors[i] = new Color(1.0f,1.0f,1.0f,m_ActorNode.RenderOpacity);
+				}
+				m_Mesh.colors = colors;
+				//renderer.sharedMaterial.color = new Color(1.0f,1.0f,1.0f,m_ActorNode.RenderOpacity);
 			}
-			renderer.sharedMaterial.renderQueue = m_RenderQueueOffset+imageNode.DrawOrder;
+			renderer.sortingOrder = m_SortingOrderOffset+imageNode.DrawOrder;
+			//renderer.sharedMaterial.renderQueue = m_RenderQueueOffset+imageNode.DrawOrder;
 		}
 	}
 }

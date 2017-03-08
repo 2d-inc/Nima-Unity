@@ -13,7 +13,9 @@ namespace Nima.Unity
 		[SerializeField]
 		private ActorAsset m_ActorAsset;
 		[SerializeField]
-		private int m_RenderQueueOffset;
+		private int m_SortingLayerID;
+		[SerializeField]
+		private int m_SortingOrder;
 
 		private ActorNodeComponent[] m_Nodes;
 		//private ActorImageComponent[] m_ImageNodes;
@@ -38,15 +40,39 @@ namespace Nima.Unity
 			}
 		}
 
-		public int RenderQueueOffset
+		public int SortingOrder
 		{
 			get
 			{
-				return m_RenderQueueOffset;
+				return m_SortingOrder;
 			}
 			set
 			{
-				m_RenderQueueOffset = value;
+				m_SortingOrder = value;
+			}
+		}
+
+		public int SortingLayerID
+		{
+			get
+			{
+				return m_SortingLayerID;
+			}
+			set
+			{
+				m_SortingLayerID = value;
+				if(m_Nodes != null)
+				{
+					foreach(ActorNodeComponent c in m_Nodes)
+					{
+						ActorImageComponent imageComponent = c as ActorImageComponent;
+						if(imageComponent != null)
+						{
+							Renderer renderer = imageComponent.gameObject.GetComponent<Renderer>();
+							renderer.sortingLayerID = m_SortingLayerID;
+						}
+					}
+				}
 			}
 		}
 
@@ -152,7 +178,8 @@ namespace Nima.Unity
 					{
 						if(ai.VertexCount == 0)
 						{
-							go = new GameObject(an.Name, typeof(ActorNodeComponent));
+							go = new GameObject(ai.Name, typeof(ActorNodeComponent));
+							m_Nodes[i] = go.GetComponent<ActorNodeComponent>();
 						}
 						else
 						{
@@ -162,9 +189,13 @@ namespace Nima.Unity
 							go = hasBones ? 
 											new GameObject(ai.Name, typeof(SkinnedMeshRenderer), typeof(ActorImageComponent)) : 
 											new GameObject(ai.Name, typeof(MeshFilter), typeof(MeshRenderer), typeof(ActorImageComponent));
+							m_Nodes[i] = go.GetComponent<ActorImageComponent>();
 
 							ActorImageComponent actorImage = go.GetComponent<ActorImageComponent>();
-							if(ai.DoesAnimationVertexDeform)
+
+							// Clone the vertex array alway right now so we can update opacity
+							// In future we could check if this node animates opacity as we did for vertex deform
+							//if(ai.DoesAnimationVertexDeform)
 			 				{
 			 					// Clone the vertex array if we deform.
 			 					Mesh clonedMesh = new Mesh();
@@ -173,7 +204,9 @@ namespace Nima.Unity
 			 					clonedMesh.boneWeights = mesh.boneWeights;
 			 					clonedMesh.bindposes = mesh.bindposes;
 			 					clonedMesh.triangles = mesh.triangles;
+			 					clonedMesh.colors = mesh.colors;
 			 					clonedMesh.RecalculateNormals();
+			 					clonedMesh.MarkDynamic();
 			 					mesh = clonedMesh;
 			 				}
 							if(hasBones)
@@ -183,6 +216,7 @@ namespace Nima.Unity
 			 					skinnedMesh.uv = mesh.uv;
 			 					skinnedMesh.boneWeights = mesh.boneWeights;
 			 					skinnedMesh.triangles = mesh.triangles;
+			 					skinnedMesh.colors = mesh.colors;
 			 					skinnedMesh.bindposes = mesh.bindposes;
 			 
 			 					go.GetComponent<SkinnedMeshRenderer>().sharedMesh = skinnedMesh;
@@ -196,6 +230,8 @@ namespace Nima.Unity
 							Renderer renderer = go.GetComponent<Renderer>();
 
 							Material material = m_ActorAsset.GetMaterial(ai.TextureIndex);
+							renderer.sortingLayerID = m_SortingLayerID;
+
 							switch(ai.BlendMode)
 							{
 								case BlendModes.Screen:
@@ -221,9 +257,9 @@ namespace Nima.Unity
 								}
 								default:
 								{
-									Material overrideMaterial = new Material(Shader.Find("Nima/Normal"));
+									/*Material overrideMaterial = new Material(Shader.Find("Nima/Normal"));
 									overrideMaterial.mainTexture = material.mainTexture;
-									material = overrideMaterial;
+									material = overrideMaterial;*/
 									break;
 								}
 							}
@@ -235,10 +271,11 @@ namespace Nima.Unity
 					else
 					{
 						go = new GameObject(an.Name, typeof(ActorNodeComponent));
+
+						m_Nodes[i] = go.GetComponent<ActorNodeComponent>();
 					}
 					
 					go.hideFlags = hideFlags;
-					m_Nodes[i] = go.GetComponent<ActorNodeComponent>();
 				}
 
 				// After they are all created, initialize them.

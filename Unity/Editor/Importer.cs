@@ -33,7 +33,7 @@ namespace Nima.Unity
 			Material m = (Material)AssetDatabase.LoadAssetAtPath(materialPath, typeof(Material));
 			if(m == null)
 			{
-				m = new Material(Shader.Find("Unlit/Transparent"));
+				m = new Material(Shader.Find("Nima/Normal"));
 				AssetDatabase.CreateAsset(m, materialPath);
 			}
 
@@ -67,7 +67,7 @@ namespace Nima.Unity
 						ActorAsset actorAsset = (ActorAsset)AssetDatabase.LoadAssetAtPath(assetPath, typeof(ActorAsset));
 						if(actorAsset != null)
 						{
-							Debug.Log("RELOADING ACTOR ASSET");
+							//Debug.Log("RELOADING ACTOR ASSET");
 							// If the load succeeds, update the GameObjects that are referencing this asset.
 							if(actorAsset.Load(rawAsset))
 							{
@@ -78,7 +78,7 @@ namespace Nima.Unity
 						}
 						else
 						{
-							Debug.Log("LOADING ACTOR ASSET");
+							//Debug.Log("LOADING ACTOR ASSET");
 							actorAsset = ScriptableObject.CreateInstance<ActorAsset>();
 							if(actorAsset.Load(rawAsset))
 							{
