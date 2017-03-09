@@ -2,7 +2,9 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 
 namespace Nima.Unity
 {
@@ -145,7 +147,9 @@ namespace Nima.Unity
 
 			if(!actorAsset.Loaded && !actorAsset.Load())
 			{
+#if UNITY_EDITOR
 				Debug.Log("Bad actorAsset referenced by Actor2D.");
+#endif
 				return;
 			}
 
@@ -346,7 +350,9 @@ namespace Nima.Unity
 			set
 			{
 				m_ActorAsset = value;
+#if UNITY_EDITOR
 				Reload();
+#endif
 			}
 		}
 
