@@ -269,7 +269,7 @@ namespace Nima.Unity
 					}
 					foreach(Nima.Animation.PropertyAnimation propertyAnimation in componentAnimation.Properties)
 					{
-						if(propertyAnimation.PropertyType == Nima.Animation.PropertyTypes.VertexDeform)
+						if(propertyAnimation != null && propertyAnimation.PropertyType == Nima.Animation.PropertyTypes.VertexDeform)
 						{
 							foreach(Nima.Animation.KeyFrame keyFrame in propertyAnimation.KeyFrames)
 							{
