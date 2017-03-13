@@ -333,6 +333,22 @@ namespace Nima.Unity
 #endif
 		}
 #if UNITY_EDITOR
+
+		private Bounds RecurseEncapsulate(Bounds bounds, Transform transform)
+		{
+			foreach (Transform child in transform)
+			{
+				bounds = RecurseEncapsulate(bounds, child.gameObject.transform);
+				Renderer r = child.gameObject.GetComponent<Renderer>();
+				if(r == null)
+				{
+					continue;
+				}
+				bounds.Encapsulate(r.bounds);
+			}
+			return bounds;
+		}
+
 		private void UpdateEditorBounds()
 		{
 			if(!Application.isPlaying)
@@ -346,15 +362,8 @@ namespace Nima.Unity
 		        this.transform.position = new Vector3(0f,0f,0f);
 
 				Bounds bounds = new Bounds(this.transform.position, Vector3.zero);
-				foreach (Transform child in transform)
-				{
-					Renderer r = child.gameObject.GetComponent<Renderer>();
-					if(r == null)
-					{
-						continue;
-					}
-					bounds.Encapsulate(r.bounds);
-				}
+				bounds = RecurseEncapsulate(bounds, transform);
+				
 				MeshFilter filter = GetComponent<MeshFilter>();
 				if(filter == null)
 				{
@@ -376,6 +385,13 @@ namespace Nima.Unity
 				this.transform.position = currentPosition;
 			}
 		}
+		void OnDrawGizmos() 
+		{
+        	Gizmos.color = Color.yellow;
+        	//Gizmos.DrawSphere(transform.position, 1);
+        	//Gizmos.DrawGUITexture(Rect(10, 10, 20, 20), myTexture);
+        	Gizmos.DrawIcon(transform.position, "ActorAsset Icon.png", false);
+    	}
 #endif
 		public ActorAsset Asset
 		{
