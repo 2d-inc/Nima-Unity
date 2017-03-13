@@ -9,9 +9,9 @@ namespace Nima.Unity
 		private int m_SortingOrderOffset = 0;
 		private Mesh m_Mesh;
 
-		public override void Initialize(ActorComponent actorComponent, Nima.ActorNode actorNode)
+		public override void Initialize(ActorComponent actorComponent)
 		{
-			base.Initialize(actorComponent, actorNode);
+			base.Initialize(actorComponent);
 
 			m_SortingOrderOffset = actorComponent.SortingOrder;
 
@@ -37,6 +37,10 @@ namespace Nima.Unity
 		void Start() 
 		{
 			ActorImage imageNode = m_ActorNode as ActorImage;
+			if(imageNode == null)
+			{
+				return;
+			}
 			if(imageNode.IsSkinned)
 			{
 				m_Mesh = GetComponent<SkinnedMeshRenderer>().sharedMesh;

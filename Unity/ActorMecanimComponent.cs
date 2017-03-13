@@ -49,7 +49,6 @@ namespace Nima.Unity
 			{
 				return;
 			}
-
 			int numLayers = m_Animator.layerCount;
 			for(int i = 0; i < numLayers; i++)
 			{

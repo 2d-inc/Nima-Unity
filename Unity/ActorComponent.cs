@@ -19,6 +19,7 @@ namespace Nima.Unity
 		[SerializeField]
 		private int m_SortingOrder;
 
+		private IActorAnimationController[] m_AnimationControllers;
 		private ActorNodeComponent[] m_Nodes;
 		//private ActorImageComponent[] m_ImageNodes;
 		//private ActorNodeComponent[] m_SkinnedBoneNodes;
@@ -89,9 +90,27 @@ namespace Nima.Unity
 			{
 				InitializeFromAsset(m_ActorAsset);
 			}
+
+			m_AnimationControllers = gameObject.GetComponents<IActorAnimationController>();
 #if UNITY_EDITOR
 			UpdateEditorBounds();
 #endif
+		}
+
+		public GameObject GetActorGameObject(string name)
+		{
+			if(m_Nodes == null)
+			{
+				return null;
+			}
+			foreach(ActorNodeComponent nodeComponent in m_Nodes)
+			{
+				if(nodeComponent != null && nodeComponent.Node != null && nodeComponent.Node.Name == name)
+				{
+					return nodeComponent.gameObject;
+				}
+			}
+			return null;
 		}
 
 #if UNITY_EDITOR
@@ -112,6 +131,7 @@ namespace Nima.Unity
 
 		void RemoveNodes()
 		{
+			m_AnimationControllers = null;
 			DestroyImmediate(m_DefaultBone);
 			if(m_Nodes != null)
 			{
@@ -130,6 +150,7 @@ namespace Nima.Unity
 						DestroyImmediate(node);
 					}
 				}
+				m_Nodes = null;
 			}
 		}
 
@@ -141,7 +162,7 @@ namespace Nima.Unity
 
 		public void InitializeFromAsset(ActorAsset actorAsset)
 		{
-			HideFlags hideFlags = HideFlags.DontSaveInEditor | HideFlags.DontSaveInBuild | HideFlags.DontUnloadUnusedAsset | HideFlags.HideInHierarchy | HideFlags.HideInInspector;
+			HideFlags hideFlags = HideFlags.DontSaveInEditor | HideFlags.DontSaveInBuild | HideFlags.DontUnloadUnusedAsset;// | HideFlags.HideInHierarchy | HideFlags.HideInInspector;
 
 			m_ActorAsset = actorAsset;
 
@@ -183,7 +204,9 @@ namespace Nima.Unity
 						if(ai.VertexCount == 0)
 						{
 							go = new GameObject(ai.Name, typeof(ActorNodeComponent));
-							m_Nodes[i] = go.GetComponent<ActorNodeComponent>();
+							ActorNodeComponent nodeComponent = go.GetComponent<ActorNodeComponent>();
+							nodeComponent.Node = ai;
+							m_Nodes[i] = nodeComponent;
 						}
 						else
 						{
@@ -193,10 +216,11 @@ namespace Nima.Unity
 							go = hasBones ? 
 											new GameObject(ai.Name, typeof(SkinnedMeshRenderer), typeof(ActorImageComponent)) : 
 											new GameObject(ai.Name, typeof(MeshFilter), typeof(MeshRenderer), typeof(ActorImageComponent));
-							m_Nodes[i] = go.GetComponent<ActorImageComponent>();
+							
 
 							ActorImageComponent actorImage = go.GetComponent<ActorImageComponent>();
-
+							m_Nodes[i] = actorImage;
+							actorImage.Node = an;
 							// Clone the vertex array alway right now so we can update opacity
 							// In future we could check if this node animates opacity as we did for vertex deform
 							//if(ai.DoesAnimationVertexDeform)
@@ -274,21 +298,33 @@ namespace Nima.Unity
 					}
 					else
 					{
-						go = new GameObject(an.Name, typeof(ActorNodeComponent));
+						ActorCollider actorCollider = an as ActorCollider;
+						if(actorCollider != null)
+						{
+							go = new GameObject(an.Name, typeof(ActorColliderComponent));
+							ActorColliderComponent colliderComponent = go.GetComponent<ActorColliderComponent>();
+							colliderComponent.Node = actorCollider;
+							m_Nodes[i] = colliderComponent;
+						}
+						else
+						{
+							go = new GameObject(an.Name, typeof(ActorNodeComponent));
 
-						m_Nodes[i] = go.GetComponent<ActorNodeComponent>();
+							ActorNodeComponent nodeComponent = go.GetComponent<ActorNodeComponent>();
+							nodeComponent.Node = an;
+							m_Nodes[i] = nodeComponent;
+						}
 					}
 					
 					go.hideFlags = hideFlags;
 				}
-
 				// After they are all created, initialize them.
 				for(int i = 0; i < m_Nodes.Length; i++)
 				{
 					ActorNodeComponent nodeComponent = m_Nodes[i];
 					if(nodeComponent != null)
 					{
-						nodeComponent.Initialize(this, actorComponents[i] as ActorNode);	
+						nodeComponent.Initialize(this);
 					}
 				}
 			}
@@ -366,6 +402,17 @@ namespace Nima.Unity
 
 		public void LateUpdate()
 		{
+			if(m_AnimationControllers != null)
+			{
+				foreach(IActorAnimationController animationController in m_AnimationControllers)
+				{
+					if(animationController != null)
+					{
+						animationController.UpdateAnimations(Time.deltaTime);
+					}
+				}
+			}
+
 			if(m_ActorInstance != null)
 			{
 				m_ActorInstance.Advance(Time.deltaTime);

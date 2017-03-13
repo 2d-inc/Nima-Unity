@@ -17,14 +17,17 @@ namespace Nima.Unity
 			{
 				return m_ActorNode;
 			}
+			set
+			{
+				m_ActorNode = value;
+			}
 		}
 
-		public virtual void Initialize(ActorComponent actorComponent, Nima.ActorNode actorNode)
+		public virtual void Initialize(ActorComponent actorComponent)
 		{
 			m_ActorComponent = actorComponent;
-			m_ActorNode = actorNode;
 
-			ActorNodeComponent parentComponent = actorComponent.Nodes[actorNode.ParentIdx];
+			ActorNodeComponent parentComponent = actorComponent.Nodes[m_ActorNode.ParentIdx];
 			if(parentComponent == this)
 			{
 				// This is the root.
