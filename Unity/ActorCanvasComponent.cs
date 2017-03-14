@@ -24,6 +24,14 @@ namespace Nima.Unity
 			}
 		}
 
+		protected override bool InstanceColliders
+		{
+			get
+			{
+				return false;
+			}
+		}
+
 		protected override void RemoveNodes()
 		{
 			base.RemoveNodes();

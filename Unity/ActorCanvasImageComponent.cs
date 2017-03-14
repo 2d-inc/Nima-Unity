@@ -13,6 +13,7 @@ namespace Nima.Unity
 		public Material m_Material;
 		private Nima.ActorImage m_ActorNode;
 		private float[] m_VertexPositionBuffer;
+		private CanvasRenderer m_Renderer;
 
 		public Nima.ActorImage Node
 		{
@@ -28,13 +29,13 @@ namespace Nima.Unity
 
 		void Start()
 		{
-			CanvasRenderer renderer = GetComponent<CanvasRenderer>();
-			renderer.Clear();
-			renderer.SetAlpha(1.0f);
-			renderer.SetColor(Color.white);
-			renderer.SetMesh(m_Mesh);
-			renderer.materialCount = 1; 
-			renderer.SetMaterial(m_Material, 0);
+			m_Renderer = GetComponent<CanvasRenderer>();
+			m_Renderer.Clear();
+			m_Renderer.SetAlpha(1.0f);
+			m_Renderer.SetColor(Color.white);
+			m_Renderer.SetMesh(m_Mesh);
+			m_Renderer.materialCount = 1; 
+			m_Renderer.SetMaterial(m_Material, 0);
 			m_VertexPositionBuffer = m_ActorNode.MakeVertexPositionBuffer();
 		}
 
@@ -70,13 +71,15 @@ namespace Nima.Unity
 			}
 			//m_Material.renderQueue = m_ActorNode.DrawOrder;
 
+			/*
 			CanvasRenderer renderer = GetComponent<CanvasRenderer>();
 			renderer.Clear();
 			renderer.SetAlpha(1.0f);
 			renderer.SetColor(Color.white);
 			renderer.SetMesh(m_Mesh);
 			renderer.materialCount = 1; 
-			renderer.SetMaterial(m_Material, 0);
+			renderer.SetMaterial(m_Material, 0);*/
+			m_Renderer.SetMesh(m_Mesh);
 		}
 	}
 }

@@ -23,6 +23,15 @@ namespace Nima.Unity
 				return m_Nodes;
 			}
 		}
+
+		protected virtual bool InstanceColliders
+		{
+			get
+			{
+				return true;
+			}
+		}
+		
 #if UNITY_EDITOR
 		protected abstract void UpdateEditorBounds();
 
@@ -171,7 +180,7 @@ namespace Nima.Unity
 					else
 					{
 						ActorCollider actorCollider = an as ActorCollider;
-						if(actorCollider != null)
+						if(actorCollider != null && InstanceColliders)
 						{
 							go = new GameObject(an.Name, typeof(ActorColliderComponent));
 							ActorColliderComponent colliderComponent = go.GetComponent<ActorColliderComponent>();

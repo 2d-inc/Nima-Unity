@@ -140,8 +140,15 @@ namespace Nima.Unity
 						int idx = 0;
 
 						Mat2D newWorldOverride = new Mat2D();
+						// Change the override to scale by our UnityScale
 						Mat2D.Multiply(newWorldOverride, m_Actor.Root.Transform, ai.WorldTransformOverride);
 						ai.WorldTransformOverride = newWorldOverride;
+
+						// We don't use the bind transforms in the regular render path as we let Unity do the deform
+						// But in the Canvas render path we need to manually deform the vertices so we need to have our
+						// bind matrices in the correct world transform.
+						ai.TransformBind(m_Actor.Root.Transform);
+
 						// Unity expects skinned mesh vertices to be in bone world space (character world).
 						// So we transform them to our world transform.
 						BoneWeight[] weights = new BoneWeight[aiVertexCount];
@@ -186,23 +193,18 @@ namespace Nima.Unity
 						}
 
 						int bidx = 1;
-						Mat2D w = m_Actor.Root.Transform;
-						Mat2D temp = new Mat2D();
 
 						foreach(ActorImage.BoneConnection bc in ai.BoneConnections)
 						{
 							Matrix4x4 mat = bindPoses[bidx];
+							Mat2D ibind = bc.InverseBind;
 
-							// Transform the bind by our root world (because we scale it) and then re-invert.
-							Mat2D.Multiply(temp, w, bc.Bind);
-							Mat2D.Invert(temp, temp);
-
-							mat[0,0] = temp[0];
-							mat[1,0] = temp[1];
-							mat[0,1] = temp[2];
-							mat[1,1] = temp[3];
-							mat[0,3] = temp[4];
-							mat[1,3] = temp[5];
+							mat[0,0] = ibind[0];
+							mat[1,0] = ibind[1];
+							mat[0,1] = ibind[2];
+							mat[1,1] = ibind[3];
+							mat[0,3] = ibind[4];
+							mat[1,3] = ibind[5];
 					        bindPoses[bidx] = mat;
 					        bidx++;
 						}
