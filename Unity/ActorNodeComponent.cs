@@ -8,7 +8,7 @@ namespace Nima.Unity
 	[ExecuteInEditMode]
 	public class ActorNodeComponent : MonoBehaviour
 	{
-		protected ActorComponent m_ActorComponent;
+		protected ActorBaseComponent m_ActorComponent;
 		protected Nima.ActorNode m_ActorNode;
 
 		public Nima.ActorNode Node
@@ -23,7 +23,7 @@ namespace Nima.Unity
 			}
 		}
 
-		public virtual void Initialize(ActorComponent actorComponent)
+		public virtual void Initialize(ActorBaseComponent actorComponent)
 		{
 			m_ActorComponent = actorComponent;
 

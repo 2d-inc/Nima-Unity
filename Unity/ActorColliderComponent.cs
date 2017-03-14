@@ -10,7 +10,7 @@ namespace Nima.Unity
 		protected Collider2D m_Collider;
 		protected ActorCollider m_ActorCollider;
 
-		public override void Initialize(ActorComponent actorComponent)
+		public override void Initialize(ActorBaseComponent actorComponent)
 		{
 			base.Initialize(actorComponent);
 			m_ActorCollider = m_ActorNode as ActorCollider;

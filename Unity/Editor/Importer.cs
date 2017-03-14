@@ -187,6 +187,32 @@ namespace Nima.Unity
 			return true;
 		}
 
+		[MenuItem("Assets/Nima/Instance Canvas Actor", false, 1)]
+		static void InstanceCanvasActor () 
+		{
+			foreach (object obj in Selection.objects) 
+			{
+				ActorAsset actorAsset = obj as ActorAsset;
+
+				string actorInstanceName = actorAsset.name;
+				GameObject go = new GameObject(actorInstanceName, typeof(ActorCanvasComponent));
+				go.GetComponent<ActorCanvasComponent>().SetActorAsset(actorAsset);
+			}
+		}
+
+		[MenuItem("Assets/Nima/Instance Canvas Actor", true, 1)]
+		static bool ValidateInstanceCanvasActor () 
+		{
+			foreach (object o in Selection.objects) 
+			{
+				if (o.GetType() != typeof(ActorAsset))
+				{
+					return false;
+				}
+			}
+			return true;
+		}
+
 		[MenuItem("Assets/Nima/Make Mecanim Controller", false, 1)]
 		static void MakeMecanimController() 
 		{
@@ -246,7 +272,7 @@ namespace Nima.Unity
 			return true;
 		}
 
-		public static void ReloadMecanimController(ActorComponent actorComponent, UnityEditor.Animations.AnimatorController animatorController)
+		public static void ReloadMecanimController(ActorBaseComponent actorComponent, UnityEditor.Animations.AnimatorController animatorController)
 		{
 			Nima.Actor actor = actorComponent.Asset.Actor;
 

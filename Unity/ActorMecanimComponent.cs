@@ -9,7 +9,7 @@ namespace Nima.Unity
 	public class ActorMecanimComponent : MonoBehaviour
 	{
 		private Animator m_Animator;
-		private ActorComponent m_ActorComponent;
+		private ActorBaseComponent m_ActorBaseComponent;
 		private Nima.Actor m_Actor;
 
 		private Dictionary<int, Nima.Animation.ActorAnimation> m_AnimationLookup;
@@ -17,11 +17,11 @@ namespace Nima.Unity
 		public void Start()
 		{
 			m_Animator = GetComponent<Animator>();
-			m_ActorComponent = GetComponent<ActorComponent>();
+			m_ActorBaseComponent = GetComponent<ActorBaseComponent>();
 			m_AnimationLookup = new Dictionary<int, Nima.Animation.ActorAnimation>();
-			if(m_ActorComponent != null)
+			if(m_ActorBaseComponent != null)
 			{
-				m_Actor = m_ActorComponent.ActorInstance;
+				m_Actor = m_ActorBaseComponent.ActorInstance;
 			}
 		}
 

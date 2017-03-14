@@ -130,7 +130,7 @@ namespace Nima.Unity
 
 					Vector3[] vertices = new Vector3[aiVertexCount];
 					Vector2[] uvs = new Vector2[aiVertexCount];
-					Color[] colors = new Color[aiVertexCount];
+					Color32[] colors = new Color32[aiVertexCount];
 
 					if(aiVertexStride == 12)
 					{
@@ -155,7 +155,7 @@ namespace Nima.Unity
 							vertices[j] = new Vector3(wt[0] * x + wt[2] * y + wt[4], wt[1] * x + wt[3] * y + wt[5], 0.0f);
 
 							uvs[j] = new Vector2(vertexBuffer[idx+aiUVOffset], 1.0f-vertexBuffer[idx+aiUVOffset+1]);
-							colors[j] = new Vector4(1.0f, 1.0f, 1.0f, ai.RenderOpacity);
+							colors[j] = new Color32(255, 255, 255, (byte)Math.Round(255*ai.RenderOpacity));
 
 							BoneWeight weight = new BoneWeight();
 							weight.boneIndex0 = (int)vertexBuffer[idx+aiVertexBoneIndexOffset];
@@ -215,7 +215,7 @@ namespace Nima.Unity
 						{
 							vertices[j] = new Vector3(vertexBuffer[idx+aiPositionOffset], vertexBuffer[idx+aiPositionOffset+1], 0);
 							uvs[j] = new Vector2(vertexBuffer[idx+aiUVOffset], 1.0f-vertexBuffer[idx+aiUVOffset+1]);
-							colors[j] = new Vector4(1.0f, 1.0f, 1.0f, ai.RenderOpacity);
+							colors[j] = new Color32(255, 255, 255, (byte)Math.Round(255*ai.RenderOpacity));
 
 							idx += aiVertexStride;
 						}
@@ -238,12 +238,12 @@ namespace Nima.Unity
 					}
 
 					mesh.triangles = tris;
-					mesh.colors = colors;
+					mesh.colors32 = colors;
 					mesh.RecalculateBounds();
 					mesh.RecalculateNormals();
 
 					// We don't need to hold the geometry data in the node now that it's in our buffers.
-					ai.DisposeGeometry();
+					// ai.DisposeGeometry(); // We now do need to hold onto it as we manually deform.
 				}
 			}
 

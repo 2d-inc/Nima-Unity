@@ -10,94 +10,59 @@ namespace Nima.Unity
 {
 	[ExecuteInEditMode]
 	[SelectionBase]
-	public class ActorComponent : ActorBaseComponent
+	public class ActorCanvasComponent : ActorBaseComponent
 	{
-		[SerializeField]
-		private int m_SortingLayerID;
-		[SerializeField]
-		private int m_SortingOrder;
-
-		private GameObject m_DefaultBone;
-
-
-		public GameObject DefaultBone
+		private List<ActorCanvasImageComponent> m_ImageComponents;
+		private ActorCanvasImageComponent[] m_SortedImageComponents;
+		// We generate a root which will store our drawn components.
+		private GameObject m_DrawOrderRoot;
+		public GameObject DrawOrderRoot
 		{
 			get
 			{
-				return m_DefaultBone;
-			}
-		}
-
-		public int SortingOrder
-		{
-			get
-			{
-				return m_SortingOrder;
-			}
-			set
-			{
-				m_SortingOrder = value;
-			}
-		}
-
-		public int SortingLayerID
-		{
-			get
-			{
-				return m_SortingLayerID;
-			}
-			set
-			{
-				m_SortingLayerID = value;
-				if(m_Nodes != null)
-				{
-					foreach(ActorNodeComponent c in m_Nodes)
-					{
-						ActorImageComponent imageComponent = c as ActorImageComponent;
-						if(imageComponent != null)
-						{
-							Renderer renderer = imageComponent.gameObject.GetComponent<Renderer>();
-							renderer.sortingLayerID = m_SortingLayerID;
-						}
-					}
-				}
+				return m_DrawOrderRoot;
 			}
 		}
 
 		protected override void RemoveNodes()
 		{
 			base.RemoveNodes();
-			DestroyImmediate(m_DefaultBone);
+			if(m_ImageComponents != null)
+			{
+				foreach(ActorCanvasImageComponent c in m_ImageComponents)
+				{
+					DestroyImmediate(c.gameObject);	
+				}
+				m_ImageComponents = null;
+			}
 		}
 
 		protected override void OnActorInstanced()
 		{
 			HideFlags hideFlags = HideFlags.DontSaveInEditor | HideFlags.DontSaveInBuild | HideFlags.DontUnloadUnusedAsset | HideFlags.HideInHierarchy | HideFlags.HideInInspector;
-
-			m_DefaultBone = new GameObject("Default Bone");
-			m_DefaultBone.transform.parent = gameObject.transform;
-			m_DefaultBone.hideFlags = hideFlags;
+			m_ImageComponents = new List<ActorCanvasImageComponent>();
+			m_DrawOrderRoot = new GameObject("Draw Order Root");
+			m_DrawOrderRoot.transform.parent = gameObject.transform;
+			m_DrawOrderRoot.hideFlags = hideFlags;
 		}
 
 		protected override ActorNodeComponent MakeImageNodeComponent(int imageNodeIndex, ActorImage actorImage)
 		{
-			if(actorImage.VertexCount == 0)
-			{
-				GameObject go = new GameObject(actorImage.Name, typeof(ActorNodeComponent));
-				ActorNodeComponent nodeComponent = go.GetComponent<ActorNodeComponent>();
-				return nodeComponent;
-			}
-			else
+			GameObject gameObject = new GameObject(actorImage.Name, typeof(ActorNodeComponent));
+			ActorNodeComponent nodeComponent = gameObject.GetComponent<ActorNodeComponent>();
+			
+			if(actorImage.VertexCount != 0)
 			{
 				Mesh mesh = m_ActorAsset.GetMesh(imageNodeIndex);
 				bool hasBones = actorImage.ConnectedBoneCount > 0;
 
-				GameObject go = hasBones ? 
-								new GameObject(actorImage.Name, typeof(SkinnedMeshRenderer), typeof(ActorImageComponent)) : 
-								new GameObject(actorImage.Name, typeof(MeshFilter), typeof(MeshRenderer), typeof(ActorImageComponent));
+				GameObject go = new GameObject(actorImage.Name, typeof(CanvasRenderer), typeof(ActorCanvasImageComponent));
 				
 
-				ActorImageComponent actorImageComponent = go.GetComponent<ActorImageComponent>();
+				ActorCanvasImageComponent actorImageComponent = go.GetComponent<ActorCanvasImageComponent>();
+				actorImageComponent.Node = actorImage;
+				go.transform.parent = m_DrawOrderRoot.transform;
+				m_ImageComponents.Add(actorImageComponent);
 				// Clone the vertex array alway right now so we can update opacity
 				// In future we could check if this node animates opacity as we did for vertex deform
 				//if(actorImage.DoesAnimationVertexDeform)
@@ -106,22 +71,22 @@ namespace Nima.Unity
  					Mesh clonedMesh = new Mesh();
  					clonedMesh.vertices = (Vector3[]) mesh.vertices.Clone();
  					clonedMesh.uv = mesh.uv;
- 					clonedMesh.boneWeights = mesh.boneWeights;
- 					clonedMesh.bindposes = mesh.bindposes;
+ 					//clonedMesh.boneWeights = mesh.boneWeights;
+ 					//clonedMesh.bindposes = mesh.bindposes;
  					clonedMesh.triangles = mesh.triangles;
  					clonedMesh.colors32 = (UnityEngine.Color32[]) mesh.colors32.Clone();
  					clonedMesh.RecalculateNormals();
  					clonedMesh.MarkDynamic();
  					mesh = clonedMesh;
  				}
-				if(hasBones)
+				/*if(hasBones)
 				{
 					Mesh skinnedMesh = new Mesh();
  					skinnedMesh.vertices = mesh.vertices;
  					skinnedMesh.uv = mesh.uv;
  					skinnedMesh.boneWeights = mesh.boneWeights;
  					skinnedMesh.triangles = mesh.triangles;
- 					skinnedMesh.colors32 = (UnityEngine.Color32[]) mesh.colors32.Clone();
+ 					skinnedMesh.colors = mesh.colors;
  					skinnedMesh.bindposes = mesh.bindposes;
  
  					go.GetComponent<SkinnedMeshRenderer>().sharedMesh = skinnedMesh;
@@ -130,12 +95,11 @@ namespace Nima.Unity
 				{
 					MeshFilter meshFilter = go.GetComponent<MeshFilter>();
 					meshFilter.sharedMesh = mesh;
-				}
+				}*/
 
-				Renderer renderer = go.GetComponent<Renderer>();
+
 
 				Material material = m_ActorAsset.GetMaterial(actorImage.TextureIndex);
-				renderer.sortingLayerID = m_SortingLayerID;
 
 				switch(actorImage.BlendMode)
 				{
@@ -162,15 +126,52 @@ namespace Nima.Unity
 					}
 					default:
 					{
-						/*Material overrideMaterial = new Material(Shader.Find("Nima/Normal"));
+					/*	Material overrideMaterial = new Material(Shader.Find("Nima/Normal"));
+						//Material overrideMaterial = new Material(Shader.Find("Transparent/Diffuse"));
+						overrideMaterial.color = Color.white;
 						overrideMaterial.mainTexture = material.mainTexture;
 						material = overrideMaterial;*/
 						break;
 					}
 				}
 				
-				renderer.sharedMaterial = material;
-				return actorImageComponent;
+				actorImageComponent.m_Mesh = mesh;
+				actorImageComponent.m_Material = material;
+			}
+
+			return nodeComponent;
+		}
+
+		protected override void OnActorInitialized()
+		{
+			m_SortedImageComponents = new ActorCanvasImageComponent[m_ImageComponents.Count];
+		}
+
+		public new void LateUpdate()
+		{
+			base.LateUpdate();
+
+			if(m_SortedImageComponents == null)
+			{
+				return;
+			}
+
+			foreach(ActorCanvasImageComponent component in m_ImageComponents)
+			{
+				if(component == null || component.Node == null)
+				{
+					continue;
+				}
+				m_SortedImageComponents[component.Node.DrawOrder-1] = component;
+			}
+			foreach(ActorCanvasImageComponent component in m_SortedImageComponents)
+			{
+				if(component == null)
+				{
+					continue;
+				}
+				component.gameObject.transform.SetAsLastSibling();
+				component.UpdateMesh();
 			}
 		}
 

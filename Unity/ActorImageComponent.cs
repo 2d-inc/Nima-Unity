@@ -9,10 +9,11 @@ namespace Nima.Unity
 		private int m_SortingOrderOffset = 0;
 		private Mesh m_Mesh;
 
-		public override void Initialize(ActorComponent actorComponent)
+		public override void Initialize(ActorBaseComponent actorBaseComponent)
 		{
-			base.Initialize(actorComponent);
+			base.Initialize(actorBaseComponent);
 
+			ActorComponent actorComponent = actorBaseComponent as ActorComponent;
 			m_SortingOrderOffset = actorComponent.SortingOrder;
 
 			ActorImage imageNode = m_ActorNode as ActorImage;
@@ -84,12 +85,12 @@ namespace Nima.Unity
 
 			if(m_Mesh.colors[0].a != m_ActorNode.RenderOpacity)
 			{
-				Color[] colors = new Color[m_Mesh.colors.Length];
-				for(int i = 0; i < m_Mesh.colors.Length; i++)
+				Color32[] colors = new Color32[m_Mesh.colors32.Length];
+				for(int i = 0; i < m_Mesh.colors32.Length; i++)
 				{
-					colors[i] = new Color(1.0f,1.0f,1.0f,m_ActorNode.RenderOpacity);
+					colors[i] = new Color32(255, 255, 255, (byte)(255.0f*m_ActorNode.RenderOpacity));
 				}
-				m_Mesh.colors = colors;
+				m_Mesh.colors32 = colors;
 				//renderer.sharedMaterial.color = new Color(1.0f,1.0f,1.0f,m_ActorNode.RenderOpacity);
 			}
 			renderer.sortingOrder = m_SortingOrderOffset+imageNode.DrawOrder;

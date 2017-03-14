@@ -16,6 +16,8 @@ Shader "Nima/Normal"
 		
 		BlendOp Add
 		Blend One OneMinusSrcAlpha, One OneMinusSrcAlpha
+		Zwrite Off
+		ZTest Always
 
 		Pass
 		{

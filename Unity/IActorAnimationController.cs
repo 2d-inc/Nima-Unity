@@ -8,7 +8,7 @@ using UnityEditor;
 
 namespace Nima.Unity
 {
-	interface IActorAnimationController
+	public interface IActorAnimationController
 	{
 		void UpdateAnimations(float elapsedSeconds);
 	}
