@@ -179,7 +179,7 @@ namespace Nima.Unity
 		{
 			foreach (object o in Selection.objects) 
 			{
-				if (o.GetType() != typeof(ActorAsset))
+				if (o == null || o.GetType() != typeof(ActorAsset))
 				{
 					return false;
 				}
@@ -195,7 +195,7 @@ namespace Nima.Unity
 				ActorAsset actorAsset = obj as ActorAsset;
 
 				string actorInstanceName = actorAsset.name;
-				GameObject go = new GameObject(actorInstanceName, typeof(ActorCanvasComponent));
+				GameObject go = new GameObject(actorInstanceName, typeof(RectTransform), typeof(ActorCanvasComponent));
 				go.GetComponent<ActorCanvasComponent>().SetActorAsset(actorAsset);
 			}
 		}
@@ -205,7 +205,7 @@ namespace Nima.Unity
 		{
 			foreach (object o in Selection.objects) 
 			{
-				if (o.GetType() != typeof(ActorAsset))
+				if (o == null || o.GetType() != typeof(ActorAsset))
 				{
 					return false;
 				}
@@ -244,9 +244,12 @@ namespace Nima.Unity
 				{
 					AnimationClip animationClip = new AnimationClip();
 					animationClip.name = actorAnimation.Name;
+					animationClip.wrapMode = actorAnimation.IsLooping ? WrapMode.Loop : WrapMode.ClampForever;
+					
 					AnimationClipSettings clipSettings = AnimationUtility.GetAnimationClipSettings(animationClip);
 					clipSettings.stopTime = actorAnimation.Duration;
 					clipSettings.loopTime = actorAnimation.IsLooping;
+
 					AnimationUtility.SetAnimationClipSettings(animationClip, clipSettings);
 
 					AssetDatabase.AddObjectToAsset(animationClip, animatorController);
@@ -264,7 +267,7 @@ namespace Nima.Unity
 		{
 			foreach (object o in Selection.objects) 
 			{
-				if (o.GetType() != typeof(ActorAsset))
+				if (o == null || o.GetType() != typeof(ActorAsset))
 				{
 					return false;
 				}

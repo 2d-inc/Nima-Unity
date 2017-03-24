@@ -34,23 +34,35 @@ namespace Nima.Unity
 
 		protected override void RemoveNodes()
 		{
-			base.RemoveNodes();
 			if(m_ImageComponents != null)
 			{
 				foreach(ActorCanvasImageComponent c in m_ImageComponents)
 				{
-					DestroyImmediate(c.gameObject);	
+					if(c != null)
+					{
+						if(c.gameObject != null)
+						{
+							DestroyImmediate(c.gameObject);	
+						}
+						else
+						{
+							DestroyImmediate(c);	
+						}
+					}
 				}
 				m_ImageComponents = null;
 			}
+			DestroyImmediate(m_DrawOrderRoot);	
+			m_DrawOrderRoot = null;
+			base.RemoveNodes();
 		}
 
 		protected override void OnActorInstanced()
 		{
 			HideFlags hideFlags = HideFlags.DontSaveInEditor | HideFlags.DontSaveInBuild | HideFlags.DontUnloadUnusedAsset | HideFlags.HideInHierarchy | HideFlags.HideInInspector;
 			m_ImageComponents = new List<ActorCanvasImageComponent>();
-			m_DrawOrderRoot = new GameObject("Draw Order Root");
-			m_DrawOrderRoot.transform.parent = gameObject.transform;
+			m_DrawOrderRoot = new GameObject("Draw Order Root", typeof(RectTransform));
+			m_DrawOrderRoot.transform.SetParent(gameObject.transform, false);
 			m_DrawOrderRoot.hideFlags = hideFlags;
 		}
 
@@ -64,12 +76,12 @@ namespace Nima.Unity
 				Mesh mesh = m_ActorAsset.GetMesh(imageNodeIndex);
 				bool hasBones = actorImage.ConnectedBoneCount > 0;
 
-				GameObject go = new GameObject(actorImage.Name, typeof(CanvasRenderer), typeof(ActorCanvasImageComponent));
+				GameObject go = new GameObject(actorImage.Name, typeof(RectTransform), typeof(CanvasRenderer), typeof(ActorCanvasImageComponent));
 				
 
 				ActorCanvasImageComponent actorImageComponent = go.GetComponent<ActorCanvasImageComponent>();
 				actorImageComponent.Node = actorImage;
-				go.transform.parent = m_DrawOrderRoot.transform;
+				go.transform.SetParent(m_DrawOrderRoot.transform, false);
 				m_ImageComponents.Add(actorImageComponent);
 				// Clone the vertex array alway right now so we can update opacity
 				// In future we could check if this node animates opacity as we did for vertex deform
@@ -201,6 +213,7 @@ namespace Nima.Unity
 
 		protected override void UpdateEditorBounds()
 		{
+			return;
 			if(!Application.isPlaying)
 			{
 				Quaternion currentRotation = this.transform.rotation;

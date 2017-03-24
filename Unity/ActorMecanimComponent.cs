@@ -64,6 +64,7 @@ namespace Nima.Unity
 				{
 					AnimatorClipInfo clipInfo = clipInfos[c];	
 					float mix = clipInfo.weight * layerMix; 
+					
 					if (mix == 0.0f)
 					{
 						continue;
@@ -71,7 +72,11 @@ namespace Nima.Unity
 					Nima.Animation.ActorAnimation actorAnimation = ClipToAnimation(clipInfo.clip);
 					if(actorAnimation != null)
 					{
-						float time = (stateInfo.normalizedTime * clipInfo.clip.length)%actorAnimation.Duration;
+						float time = (stateInfo.normalizedTime * clipInfo.clip.length);
+						if(stateInfo.loop)
+						{
+							time %= actorAnimation.Duration;
+						}
 						actorAnimation.Apply(time, m_Actor, mix);
 					}
 				}
@@ -88,7 +93,11 @@ namespace Nima.Unity
 						Nima.Animation.ActorAnimation actorAnimation = ClipToAnimation(clipInfo.clip);
 						if(actorAnimation != null)
 						{
-							float time = (nextStateInfo.normalizedTime * clipInfo.clip.length)%actorAnimation.Duration;
+							float time = (nextStateInfo.normalizedTime * clipInfo.clip.length);
+							if(nextStateInfo.loop)
+							{
+								time %= actorAnimation.Duration;
+							}
 							actorAnimation.Apply(time, m_Actor, mix);
 						}
 					}

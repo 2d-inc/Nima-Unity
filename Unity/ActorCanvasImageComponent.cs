@@ -29,6 +29,10 @@ namespace Nima.Unity
 
 		void Start()
 		{
+			if(m_ActorNode == null)
+			{
+				return;
+			}
 			m_Renderer = GetComponent<CanvasRenderer>();
 			m_Renderer.Clear();
 			m_Renderer.SetAlpha(1.0f);
@@ -67,18 +71,7 @@ namespace Nima.Unity
 					colors[i] = new Color32(255, 255, 255, (byte)(255.0f*m_ActorNode.RenderOpacity));
 				}
 				m_Mesh.colors32 = colors;
-				//renderer.sharedMaterial.color = new Color(1.0f,1.0f,1.0f,m_ActorNode.RenderOpacity);
 			}
-			//m_Material.renderQueue = m_ActorNode.DrawOrder;
-
-			/*
-			CanvasRenderer renderer = GetComponent<CanvasRenderer>();
-			renderer.Clear();
-			renderer.SetAlpha(1.0f);
-			renderer.SetColor(Color.white);
-			renderer.SetMesh(m_Mesh);
-			renderer.materialCount = 1; 
-			renderer.SetMaterial(m_Material, 0);*/
 			m_Renderer.SetMesh(m_Mesh);
 		}
 	}

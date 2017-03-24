@@ -14,6 +14,7 @@ Shader "Nima/Additive"
 			"RenderType" = "Transparent" 	
 		}
 		
+		Cull Off
 		BlendOp Add
 		Blend One One, One One
 

@@ -14,8 +14,8 @@ Shader "Nima/Multiply"
 			"RenderType" = "Transparent" 	
 		}
 		
+		Cull Off
 		BlendOp Add
-//		_GL.DST_COLOR, _GL.ONE_MINUS_SRC_ALPHA, _GL.DST_ALPHA, _GL.ONE_MINUS_SRC_ALPHA
 		Blend DstColor OneMinusSrcAlpha, DstAlpha OneMinusSrcAlpha
 
 		Pass

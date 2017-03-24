@@ -14,6 +14,7 @@ Shader "Nima/Screen"
 			"RenderType" = "Transparent" 	
 		}
 		
+		Cull Off
 		BlendOp Add
 		Blend One OneMinusSrcColor, One OneMinusSrcAlpha
 

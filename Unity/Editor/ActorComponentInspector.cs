@@ -105,6 +105,14 @@ namespace Nima.Unity.Editor
 			{
 				actor.Asset = asset;
 			}
+			/*if(actor.Asset != null)
+			{
+				for(int i = 0; i < actor.Asset.m_TextureMaterials.Length; i++)
+				{
+					Material mat = null;
+					Material m = EditorGUILayout.ObjectField(mat, typeof(Material), false) as Material;
+				}
+			}*/
 			if(GUILayout.Button("Reload"))
 			{
 				actor.Reload();

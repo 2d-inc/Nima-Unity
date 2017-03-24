@@ -15,10 +15,14 @@ Shader "Nima/Normal"
 		}
 		
 		BlendOp Add
+		Cull Off
 		Blend One OneMinusSrcAlpha, One OneMinusSrcAlpha
 		Zwrite Off
 		ZTest Always
-
+		/*Stencil {
+			Ref 1
+			Comp Equal
+		}*/
 		Pass
 		{
 			CGPROGRAM

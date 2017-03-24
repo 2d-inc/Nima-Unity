@@ -75,7 +75,7 @@ namespace Nima.Unity
 			HideFlags hideFlags = HideFlags.DontSaveInEditor | HideFlags.DontSaveInBuild | HideFlags.DontUnloadUnusedAsset | HideFlags.HideInHierarchy | HideFlags.HideInInspector;
 
 			m_DefaultBone = new GameObject("Default Bone");
-			m_DefaultBone.transform.parent = gameObject.transform;
+			m_DefaultBone.transform.SetParent(gameObject.transform, false);
 			m_DefaultBone.hideFlags = hideFlags;
 		}
 
