@@ -13,6 +13,8 @@ namespace Nima.Unity
 		[SerializeField]
 		protected ActorAsset m_ActorAsset;
 		protected IActorAnimationController[] m_AnimationControllers;
+		protected IActorManipulationController[] m_ManipulationControllers;
+
 		protected ActorNodeComponent[] m_Nodes;
 		protected Actor m_ActorInstance;
 
@@ -55,6 +57,19 @@ namespace Nima.Unity
 			}
 
 			m_AnimationControllers = gameObject.GetComponents<IActorAnimationController>();
+			m_ManipulationControllers = gameObject.GetComponents<IActorManipulationController>();
+
+		
+			if(m_ManipulationControllers != null)
+			{
+				foreach(IActorManipulationController manipulationController in m_ManipulationControllers)
+				{
+					if(manipulationController != null)
+					{
+						manipulationController.SetupManipulator(this);
+					}
+				}
+			}
 #if UNITY_EDITOR
 			UpdateEditorBounds();
 #endif
@@ -94,6 +109,7 @@ namespace Nima.Unity
 		protected virtual void RemoveNodes()
 		{
 			m_AnimationControllers = null;
+			m_ManipulationControllers = null;
 			if(m_Nodes != null)
 			{
 				foreach(ActorNodeComponent node in m_Nodes)
@@ -266,6 +282,17 @@ namespace Nima.Unity
 						continue;
 					}
 					node.UpdateTransform();
+				}
+			}
+
+			if(m_ManipulationControllers != null)
+			{
+				foreach(IActorManipulationController manipulationController in m_ManipulationControllers)
+				{
+					if(manipulationController != null)
+					{
+						manipulationController.ManipulateActor(this);
+					}
 				}
 			}
 #if UNITY_EDITOR
