@@ -10,7 +10,7 @@ namespace Nima.Unity
 {
 	[ExecuteInEditMode]
 	[SelectionBase]
-	public class ActorComponent : ActorBaseComponent
+	public class ActorComponent : ActorBaseComponent, IRenderSortableComponent
 	{
 		[SerializeField]
 		private int m_SortingLayerID;

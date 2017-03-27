@@ -46,7 +46,7 @@ namespace Nima.Unity
 
 		public void UpdateMesh()
 		{
-			if(m_ActorNode == null || m_Mesh == null)
+			if(m_ActorNode == null || m_Mesh == null || m_ActorNode.VertexCount == 0)
 			{
 				return;
 			}
@@ -63,12 +63,13 @@ namespace Nima.Unity
 			}
 			m_Mesh.vertices = verts;
 
-			if(m_Mesh.colors[0].a != m_ActorNode.RenderOpacity)
+			byte alpha = (byte)(255.0f*m_ActorNode.RenderOpacity);
+			if(m_Mesh.colors32[0].a != alpha)
 			{
 				Color32[] colors = new Color32[m_Mesh.colors32.Length];
-				for(int i = 0; i < m_Mesh.colors32.Length; i++)
+				for(int i = 0; i < colors.Length; i++)
 				{
-					colors[i] = new Color32(255, 255, 255, (byte)(255.0f*m_ActorNode.RenderOpacity));
+					colors[i] = new Color32(255, 255, 255, alpha);
 				}
 				m_Mesh.colors32 = colors;
 			}

@@ -71,93 +71,64 @@ namespace Nima.Unity
 			GameObject gameObject = new GameObject(actorImage.Name, typeof(ActorNodeComponent));
 			ActorNodeComponent nodeComponent = gameObject.GetComponent<ActorNodeComponent>();
 			
-			if(actorImage.VertexCount != 0)
+			Mesh mesh = m_ActorAsset.GetMesh(imageNodeIndex);
+			bool hasBones = actorImage.ConnectedBoneCount > 0;
+
+			GameObject go = new GameObject(actorImage.Name, typeof(RectTransform), typeof(CanvasRenderer), typeof(ActorCanvasImageComponent));
+
+			ActorCanvasImageComponent actorImageComponent = go.GetComponent<ActorCanvasImageComponent>();
+			actorImageComponent.Node = actorImage;
+			go.transform.SetParent(m_DrawOrderRoot.transform, false);
+			m_ImageComponents.Add(actorImageComponent);
+
+			// Clone the vertex array alway right now so we can update opacity
+			Mesh clonedMesh = new Mesh();
+			clonedMesh.vertices = (Vector3[]) mesh.vertices.Clone();
+			clonedMesh.uv = mesh.uv;
+			clonedMesh.triangles = mesh.triangles;
+			clonedMesh.colors32 = (UnityEngine.Color32[]) mesh.colors32.Clone();
+			clonedMesh.RecalculateNormals();
+			clonedMesh.MarkDynamic();
+			mesh = clonedMesh;
+
+			Material material = m_ActorAsset.GetMaterial(actorImage.TextureIndex);
+
+			switch(actorImage.BlendMode)
 			{
-				Mesh mesh = m_ActorAsset.GetMesh(imageNodeIndex);
-				bool hasBones = actorImage.ConnectedBoneCount > 0;
-
-				GameObject go = new GameObject(actorImage.Name, typeof(RectTransform), typeof(CanvasRenderer), typeof(ActorCanvasImageComponent));
-				
-
-				ActorCanvasImageComponent actorImageComponent = go.GetComponent<ActorCanvasImageComponent>();
-				actorImageComponent.Node = actorImage;
-				go.transform.SetParent(m_DrawOrderRoot.transform, false);
-				m_ImageComponents.Add(actorImageComponent);
-				// Clone the vertex array alway right now so we can update opacity
-				// In future we could check if this node animates opacity as we did for vertex deform
-				//if(actorImage.DoesAnimationVertexDeform)
- 				{
- 					// Clone the vertex array if we deform.
- 					Mesh clonedMesh = new Mesh();
- 					clonedMesh.vertices = (Vector3[]) mesh.vertices.Clone();
- 					clonedMesh.uv = mesh.uv;
- 					//clonedMesh.boneWeights = mesh.boneWeights;
- 					//clonedMesh.bindposes = mesh.bindposes;
- 					clonedMesh.triangles = mesh.triangles;
- 					clonedMesh.colors32 = (UnityEngine.Color32[]) mesh.colors32.Clone();
- 					clonedMesh.RecalculateNormals();
- 					clonedMesh.MarkDynamic();
- 					mesh = clonedMesh;
- 				}
-				/*if(hasBones)
+				case BlendModes.Screen:
 				{
-					Mesh skinnedMesh = new Mesh();
- 					skinnedMesh.vertices = mesh.vertices;
- 					skinnedMesh.uv = mesh.uv;
- 					skinnedMesh.boneWeights = mesh.boneWeights;
- 					skinnedMesh.triangles = mesh.triangles;
- 					skinnedMesh.colors = mesh.colors;
- 					skinnedMesh.bindposes = mesh.bindposes;
- 
- 					go.GetComponent<SkinnedMeshRenderer>().sharedMesh = skinnedMesh;
+					Material overrideMaterial = new Material(Shader.Find("Nima/Screen"));
+					overrideMaterial.mainTexture = material.mainTexture;
+					material = overrideMaterial;
+					break;
 				}
-				else
+				case BlendModes.Additive:
 				{
-					MeshFilter meshFilter = go.GetComponent<MeshFilter>();
-					meshFilter.sharedMesh = mesh;
-				}*/
-
-
-
-				Material material = m_ActorAsset.GetMaterial(actorImage.TextureIndex);
-
-				switch(actorImage.BlendMode)
-				{
-					case BlendModes.Screen:
-					{
-						Material overrideMaterial = new Material(Shader.Find("Nima/Screen"));
-						overrideMaterial.mainTexture = material.mainTexture;
-						material = overrideMaterial;
-						break;
-					}
-					case BlendModes.Additive:
-					{
-						Material overrideMaterial = new Material(Shader.Find("Nima/Additive"));
-						overrideMaterial.mainTexture = material.mainTexture;
-						material = overrideMaterial;
-						break;
-					}
-					case BlendModes.Multiply:
-					{
-						Material overrideMaterial = new Material(Shader.Find("Nima/Multiply"));
-						overrideMaterial.mainTexture = material.mainTexture;
-						material = overrideMaterial;
-						break;
-					}
-					default:
-					{
-					/*	Material overrideMaterial = new Material(Shader.Find("Nima/Normal"));
-						//Material overrideMaterial = new Material(Shader.Find("Transparent/Diffuse"));
-						overrideMaterial.color = Color.white;
-						overrideMaterial.mainTexture = material.mainTexture;
-						material = overrideMaterial;*/
-						break;
-					}
+					Material overrideMaterial = new Material(Shader.Find("Nima/Additive"));
+					overrideMaterial.mainTexture = material.mainTexture;
+					material = overrideMaterial;
+					break;
 				}
-				
-				actorImageComponent.m_Mesh = mesh;
-				actorImageComponent.m_Material = material;
+				case BlendModes.Multiply:
+				{
+					Material overrideMaterial = new Material(Shader.Find("Nima/Multiply"));
+					overrideMaterial.mainTexture = material.mainTexture;
+					material = overrideMaterial;
+					break;
+				}
+				default:
+				{
+				/*	Material overrideMaterial = new Material(Shader.Find("Nima/Normal"));
+					//Material overrideMaterial = new Material(Shader.Find("Transparent/Diffuse"));
+					overrideMaterial.color = Color.white;
+					overrideMaterial.mainTexture = material.mainTexture;
+					material = overrideMaterial;*/
+					break;
+				}
 			}
+			
+			actorImageComponent.m_Mesh = mesh;
+			actorImageComponent.m_Material = material;
 
 			return nodeComponent;
 		}
@@ -182,7 +153,8 @@ namespace Nima.Unity
 				{
 					continue;
 				}
-				m_SortedImageComponents[component.Node.DrawOrder-1] = component;
+				//Debug.Log("DRAWID" + component.Node.DrawIndex + " " + m_SortedImageComponents.Length);
+				m_SortedImageComponents[component.Node.DrawIndex] = component;
 			}
 			foreach(ActorCanvasImageComponent component in m_SortedImageComponents)
 			{

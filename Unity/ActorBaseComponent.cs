@@ -225,11 +225,13 @@ namespace Nima.Unity
 					}
 				}
 			}
+
+			OnActorInitialized();
+			
 #if UNITY_EDITOR
 			LateUpdate();
 			UpdateEditorBounds();
 #endif
-			OnActorInitialized();
 		}
 
 		public ActorAsset Asset

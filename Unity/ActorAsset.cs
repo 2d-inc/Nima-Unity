@@ -84,6 +84,10 @@ namespace Nima.Unity
 
 		public Material GetMaterial(int idx)
 		{
+			if(idx < 0 || idx >= m_TextureMaterials.Length)
+			{
+				return null;
+			}
 			return m_TextureMaterials[idx];
 		}
 		
@@ -148,6 +152,12 @@ namespace Nima.Unity
 						// But in the Canvas render path we need to manually deform the vertices so we need to have our
 						// bind matrices in the correct world transform.
 						ai.TransformBind(m_Actor.Root.Transform);
+
+						if(ai.DoesAnimationVertexDeform)
+						{
+							// Update the vertex deforms too.
+							ai.TransformDeformVertices(ai.WorldTransform);
+						}
 
 						// Unity expects skinned mesh vertices to be in bone world space (character world).
 						// So we transform them to our world transform.
