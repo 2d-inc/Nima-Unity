@@ -187,6 +187,32 @@ namespace Nima.Unity
 			return true;
 		}
 
+		[MenuItem("Assets/Nima/Instance Single Mesh Actor", false, 1)]
+		static void InstanceSingleMeshActor () 
+		{
+			foreach (object obj in Selection.objects) 
+			{
+				ActorAsset actorAsset = obj as ActorAsset;
+
+				string actorInstanceName = actorAsset.name;
+				GameObject go = new GameObject(actorInstanceName, typeof(MeshFilter), typeof(MeshRenderer), typeof(ActorSingleMeshComponent));
+				go.GetComponent<ActorSingleMeshComponent>().SetActorAsset(actorAsset);
+			}
+		}
+
+		[MenuItem("Assets/Nima/Instance Single Mesh Actor", true, 1)]
+		static bool ValidateInstanceSingleMeshActor () 
+		{
+			foreach (object o in Selection.objects) 
+			{
+				if (o == null || o.GetType() != typeof(ActorAsset))
+				{
+					return false;
+				}
+			}
+			return true;
+		}
+
 		[MenuItem("Assets/Nima/Instance Canvas Actor", false, 1)]
 		static void InstanceCanvasActor () 
 		{
