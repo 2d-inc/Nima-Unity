@@ -14,6 +14,7 @@ namespace Nima.Unity
 		protected ActorAsset m_ActorAsset;
 		protected IActorAnimationController[] m_AnimationControllers;
 		protected IActorManipulationController[] m_ManipulationControllers;
+		protected List<IActorFinalFormDependent> m_FinalFormDependents;
 
 		protected ActorNodeComponent[] m_Nodes;
 		protected Actor m_ActorInstance;
@@ -44,6 +45,19 @@ namespace Nima.Unity
 
 #endif
 
+		public void AddFinalFormDependent(IActorFinalFormDependent dependent)
+		{
+			m_FinalFormDependents.Add(dependent);
+		}
+
+		public void RemoveFinalFormDependent(IActorFinalFormDependent dependent)
+		{
+			if(m_FinalFormDependents != null)
+			{
+				m_FinalFormDependents.Remove(dependent);
+			}
+		}
+
 		public void Awake()
 		{
 			if(m_ActorAsset == null)
@@ -58,7 +72,7 @@ namespace Nima.Unity
 
 			m_AnimationControllers = gameObject.GetComponents<IActorAnimationController>();
 			m_ManipulationControllers = gameObject.GetComponents<IActorManipulationController>();
-
+			m_FinalFormDependents = new List<IActorFinalFormDependent>();
 		
 			if(m_ManipulationControllers != null)
 			{
@@ -295,6 +309,17 @@ namespace Nima.Unity
 					{
 						manipulationController.ManipulateActor(this);
 					}
+				}
+			}
+
+			if(m_FinalFormDependents != null)
+			{
+				foreach(IActorFinalFormDependent dependent in m_FinalFormDependents)
+				{
+					if(dependent != null)
+					{
+						dependent.OnFinalForm(this);
+					}	
 				}
 			}
 #if UNITY_EDITOR
