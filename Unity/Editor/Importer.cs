@@ -326,6 +326,13 @@ namespace Nima.Unity
 					{
 						exists = true;
 						alreadyUsedAnimations.Add(actorAnimation);
+						clip.SetCurve("", typeof(GameObject), "null", AnimationCurve.Linear(0, 0, actorAnimation.Duration, 0));
+						AnimationClipSettings clipSettings = AnimationUtility.GetAnimationClipSettings(clip);
+						clipSettings.stopTime = actorAnimation.Duration;
+						clipSettings.loopTime = actorAnimation.IsLooping;
+						AnimationUtility.SetAnimationClipSettings(clip, clipSettings);
+
+						EditorUtility.SetDirty(clip);
 						break;
 					}
 				}
@@ -337,10 +344,12 @@ namespace Nima.Unity
 
 			foreach(Nima.Animation.ActorAnimation actorAnimation in actor.Animations)
 			{
-				if(alreadyUsedAnimations.IndexOf(actorAnimation) == -1)
+				int idx = alreadyUsedAnimations.IndexOf(actorAnimation);
+				if(idx == -1)
 				{
 					AnimationClip animationClip = new AnimationClip();
 					animationClip.name = actorAnimation.Name;
+					animationClip.SetCurve("", typeof(GameObject), "null", AnimationCurve.Linear(0, 0, actorAnimation.Duration, 0));
 					AnimationClipSettings clipSettings = AnimationUtility.GetAnimationClipSettings(animationClip);
 					clipSettings.stopTime = actorAnimation.Duration;
 					clipSettings.loopTime = actorAnimation.IsLooping;
