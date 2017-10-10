@@ -105,6 +105,22 @@ namespace Nima.Unity
 			return null;
 		}
 
+		public ActorNodeComponent GetActorNodeComponent(string name)
+		{
+			if(m_Nodes == null)
+			{
+				return null;
+			}
+			foreach(ActorNodeComponent nodeComponent in m_Nodes)
+			{
+				if(nodeComponent != null && nodeComponent.Node != null && nodeComponent.Node.Name == name)
+				{
+					return nodeComponent;
+				}
+			}
+			return null;
+		}
+
 #if UNITY_EDITOR
 		public void SetActorAsset(ActorAsset asset)
 		{
@@ -288,6 +304,17 @@ namespace Nima.Unity
 			{
 				m_ActorInstance.Advance(Time.deltaTime);
 			}
+
+			if(m_ManipulationControllers != null)
+			{
+				foreach(IActorManipulationController manipulationController in m_ManipulationControllers)
+				{
+					if(manipulationController != null)
+					{
+						manipulationController.ManipulateActor(this);
+					}
+				}
+			}
 			
 			if(m_Nodes != null)
 			{
@@ -298,17 +325,6 @@ namespace Nima.Unity
 						continue;
 					}
 					node.UpdateTransform();
-				}
-			}
-
-			if(m_ManipulationControllers != null)
-			{
-				foreach(IActorManipulationController manipulationController in m_ManipulationControllers)
-				{
-					if(manipulationController != null)
-					{
-						manipulationController.ManipulateActor(this);
-					}
 				}
 			}
 

@@ -119,12 +119,13 @@ namespace Nima.Unity
 				return;
 			}
 			Matrix4x4 world = m_MountTargetObject.transform.localToWorldMatrix;
+
 			Matrix4x4 localParent = Matrix4x4.identity;
 			if(gameObject.transform.parent)
 			{
 				localParent = gameObject.transform.parent.worldToLocalMatrix;
 			}
-			Matrix4x4 localTransform = world * localParent;
+			Matrix4x4 localTransform = localParent * world;
 
 			Mat2D m2d = new Mat2D();
 			m2d[0] = localTransform[0,0];

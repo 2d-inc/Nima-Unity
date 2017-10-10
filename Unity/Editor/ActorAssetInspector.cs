@@ -15,7 +15,7 @@ namespace Nima.Unity.Editor
 			if(m_PreviewRenderUtility == null)
 			{
 				m_PreviewRenderUtility = new PreviewRenderUtility();
-				m_PreviewRenderUtility.m_Camera.orthographic = true;//transform.position = new Vector3(0, 0, -6);
+				m_PreviewRenderUtility.camera.orthographic = true;//transform.position = new Vector3(0, 0, -6);
 				//m_PreviewRenderUtility.m_Camera.transform.rotation = Quaternion.identity;
 			}
 			return true;
@@ -35,9 +35,9 @@ namespace Nima.Unity.Editor
 				{
 
 					
-					m_PreviewRenderUtility.m_Camera.orthographicSize = 12.0f;//scale * 2f;
-					m_PreviewRenderUtility.m_Camera.nearClipPlane = 0f;
-					m_PreviewRenderUtility.m_Camera.farClipPlane = 25f;
+					m_PreviewRenderUtility.camera.orthographicSize = 12.0f;//scale * 2f;
+					m_PreviewRenderUtility.camera.nearClipPlane = 0f;
+					m_PreviewRenderUtility.camera.farClipPlane = 25f;
 
 					m_PreviewRenderUtility.BeginPreview(r, background);
 					ActorAsset asset = target as ActorAsset;
@@ -78,7 +78,7 @@ namespace Nima.Unity.Editor
 					/*m_PreviewRenderUtility.m_Camera.transform.position = Vector2.zero;
 					m_PreviewRenderUtility.m_Camera.transform.rotation = Quaternion.Euler(new Vector3(-_drag.y, -_drag.x, 0));
 					m_PreviewRenderUtility.m_Camera.transform.position = m_PreviewRenderUtility.m_Camera.transform.forward * -6f;*/
-					m_PreviewRenderUtility.m_Camera.Render();
+					m_PreviewRenderUtility.camera.Render();
 
 					Texture resultRender = m_PreviewRenderUtility.EndPreview();
 					GUI.DrawTexture(r, resultRender, ScaleMode.StretchToFill, false);

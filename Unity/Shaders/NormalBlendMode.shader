@@ -1,3 +1,5 @@
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
 Shader "Nima/Normal"
 {
 	Properties
@@ -53,7 +55,7 @@ Shader "Nima/Normal"
 			{
 				VertexOutput vertexOutput;
 				
-				vertexOutput.vertex = mul(UNITY_MATRIX_MVP, vertexInput.vertex);
+				vertexOutput.vertex = UnityObjectToClipPos(vertexInput.vertex);
 				vertexOutput.texcoord = vertexInput.texcoord;
 				vertexOutput.color = vertexInput.color * _Color;
 							
