@@ -250,7 +250,7 @@ namespace Nima.Unity
 				}
 
 				component.m_Triangles = triangles;
-				m_Mesh.SetTriangles(/*ai.DoesAnimationVertexDeform ? new int[0] : */triangles, ai.DrawIndex);
+				m_Mesh.SetTriangles(ai.RenderCollapsed ? new int[0] : triangles, ai.DrawIndex);
 				materials[ai.DrawIndex] = component.m_Material;
 
 				vertexOffset += vertexCount;
@@ -311,7 +311,7 @@ namespace Nima.Unity
 					continue;
 				}
 				ActorImage ai = component.Node as ActorImage;
-				m_Mesh.SetTriangles(/*ai.DoesAnimationVertexDeform ? new int[0] : */component.m_Triangles, ai.DrawIndex);
+				m_Mesh.SetTriangles(ai.RenderCollapsed ? new int[0] : component.m_Triangles, ai.DrawIndex);
 				materials[ai.DrawIndex] = component.m_Material;
 			}
 

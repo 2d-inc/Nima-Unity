@@ -58,8 +58,16 @@ namespace Nima.Unity
 			{
 				return;
 			}
-
+			Renderer renderer = gameObject.GetComponent<Renderer>();
 			ActorImage imageNode = m_ActorNode as ActorImage;
+
+			if (imageNode.RenderCollapsed) {
+				renderer.enabled = false;
+				return;
+			} else {
+				renderer.enabled = true;
+			}
+
 			if(imageNode.IsVertexDeformDirty)
 			{
 				float[] v = imageNode.AnimationDeformedVertices;
@@ -79,9 +87,6 @@ namespace Nima.Unity
 			{
 				base.UpdateTransform();
 			}
-
-			Renderer renderer = gameObject.GetComponent<Renderer>();
-
 
 			if(m_Mesh.colors[0].a != m_ActorNode.RenderOpacity)
 			{

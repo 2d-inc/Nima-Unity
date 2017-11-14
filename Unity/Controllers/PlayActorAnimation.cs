@@ -78,8 +78,9 @@ namespace Nima.Unity
 				{
 					m_Animation = m_ActorInstance.GetAnimation(m_AnimationName);
 				}
+
+				m_AnimationTime = m_Offset*m_Animation.Duration;
 			}
-			m_AnimationTime = m_Offset*m_Animation.Duration;
 		}
 
 		public void UpdateAnimations(float elapsedSeconds)

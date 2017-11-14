@@ -35,7 +35,7 @@ namespace Nima.Unity
 			}
 			m_Renderer = GetComponent<CanvasRenderer>();
 			m_Renderer.Clear();
-			m_Renderer.SetAlpha(1.0f);
+			m_Renderer.SetAlpha(m_ActorNode.RenderCollapsed ? 0.0f : 1.0f);
 			m_Renderer.SetColor(Color.white);
 			m_Renderer.SetMesh(m_Mesh);
 			m_Renderer.materialCount = 1; 
@@ -50,6 +50,13 @@ namespace Nima.Unity
 			{
 				return;
 			}
+
+			if (m_ActorNode.RenderCollapsed) {
+				m_Renderer.SetAlpha (0.0f);
+			} else {
+				m_Renderer.SetAlpha (1.0f);
+			}
+
 			m_ActorNode.UpdateVertexPositionBuffer(m_VertexPositionBuffer);
 
 			int numVerts = m_VertexPositionBuffer.Length/2;
