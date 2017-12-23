@@ -16,4 +16,4 @@ Take a look at https://github.com/2d-inc/Nima-Unity-Testing for an example imple
 5. Submit a pull request.
 
 ## License
-Hold please...
+See the [LICENSE](LICENSE.md) file for license rights and limitations (MIT).
