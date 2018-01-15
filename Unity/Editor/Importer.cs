@@ -171,7 +171,7 @@ namespace Nima.Unity
 		// 	return true;
 		// }
 
-		[MenuItem("Assets/Nima/Instance Single Mesh Actor", false, 1)]
+		[MenuItem("Assets/Nima/Instance Actor", false, 1)]
 		static void InstanceSingleMeshActor () 
 		{
 			foreach (object obj in Selection.objects) 
@@ -184,7 +184,7 @@ namespace Nima.Unity
 			}
 		}
 
-		[MenuItem("Assets/Nima/Instance Single Mesh Actor", true, 1)]
+		[MenuItem("Assets/Nima/Instance Actor", true, 1)]
 		static bool ValidateInstanceSingleMeshActor () 
 		{
 			foreach (object o in Selection.objects) 
