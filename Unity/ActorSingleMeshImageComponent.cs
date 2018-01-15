@@ -40,7 +40,7 @@ namespace Nima.Unity
 			{
 				float x = m_VertexPositionBuffer[readIdx++];
 				float y = m_VertexPositionBuffer[readIdx++];
-				verts[writeIdx] = new Vector3(x, y, 0.0f);
+				verts[writeIdx] = new Vector3(x*ActorAsset.NimaToUnityScale, y*ActorAsset.NimaToUnityScale, 0.0f);
 				writeIdx++;
 			}
 

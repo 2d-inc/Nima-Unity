@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using UnityEngine;
+using Nima.Math2D;
 
 namespace Nima.Unity
 {
@@ -83,6 +84,13 @@ namespace Nima.Unity
 			base.UpdateTransform();
 
 			m_Collider.enabled = m_ActorCollider.IsCollisionEnabled;
+			
+			Mat2D world = m_ActorNode.WorldTransform;
+			Vec2D scale = new Vec2D();
+			float angle = Mat2D.Decompose(world, scale);
+			transform.localEulerAngles = new Vector3(0.0f, 0.0f, angle * Mathf.Rad2Deg);
+			transform.localScale = new Vector3(scale[0] * ActorAsset.NimaToUnityScale, scale[1] * ActorAsset.NimaToUnityScale, 1.0f);
+			transform.localPosition = new Vector3(world[4] * ActorAsset.NimaToUnityScale, world[5] * ActorAsset.NimaToUnityScale, 0.0f);
 		}
 	}
 }

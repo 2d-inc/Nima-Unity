@@ -96,8 +96,8 @@ namespace Nima.Unity
 		private void InitializeActor()
 		{
 			IEnumerable<ActorNode> nodes = m_Actor.Nodes;
-			m_Actor.Root.ScaleX = NimaToUnityScale;
-			m_Actor.Root.ScaleY = NimaToUnityScale;
+			//m_Actor.Root.ScaleX = NimaToUnityScale;
+			//m_Actor.Root.ScaleY = NimaToUnityScale;
 
 			int imgNodeCount = 0;
 			foreach(ActorNode node in nodes)

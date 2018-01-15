@@ -89,6 +89,11 @@ namespace Nima.Unity
 #endif
 		}
 
+		public ActorNode GetActorNode(string name)
+		{
+			return m_ActorInstance.GetNode(name);
+		}
+
 		public GameObject GetActorGameObject(string name)
 		{
 			if(m_Nodes == null)
@@ -180,7 +185,7 @@ namespace Nima.Unity
 
 		public void InitializeFromAsset(ActorAsset actorAsset)
 		{
-			HideFlags hideFlags = HideFlags.DontSaveInEditor | HideFlags.DontSaveInBuild | HideFlags.DontUnloadUnusedAsset | HideFlags.HideInHierarchy | HideFlags.HideInInspector;
+			HideFlags hideFlags = HideFlags.DontSaveInEditor | HideFlags.DontSaveInBuild | HideFlags.DontUnloadUnusedAsset;// | HideFlags.HideInHierarchy | HideFlags.HideInInspector;
 
 			m_ActorAsset = actorAsset;
 
@@ -213,7 +218,7 @@ namespace Nima.Unity
 					{
 						continue;
 					}
-					GameObject go;
+					GameObject go = null;
 					ActorImage ai = an as ActorImage;
 					if(ai != null)
 					{
@@ -233,17 +238,20 @@ namespace Nima.Unity
 							colliderComponent.Node = actorCollider;
 							m_Nodes[i] = colliderComponent;
 						}
-						else
-						{
-							go = new GameObject(an.Name, typeof(ActorNodeComponent));
+						// else
+						// {
+						// 	go = new GameObject(an.Name, typeof(ActorNodeComponent));
 
-							ActorNodeComponent nodeComponent = go.GetComponent<ActorNodeComponent>();
-							nodeComponent.Node = an;
-							m_Nodes[i] = nodeComponent;
-						}
+						// 	ActorNodeComponent nodeComponent = go.GetComponent<ActorNodeComponent>();
+						// 	nodeComponent.Node = an;
+						// 	m_Nodes[i] = nodeComponent;
+						// }
 					}
 					
-					go.hideFlags = hideFlags;
+					if(go != null)
+					{
+						go.hideFlags = hideFlags;
+					}
 				}
 				// After they are all created, initialize them.
 				for(int i = 0; i < m_Nodes.Length; i++)

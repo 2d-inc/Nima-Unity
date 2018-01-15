@@ -18,7 +18,7 @@ namespace Nima.Unity
 		AimSlice[] m_AimLookup = new AimSlice[AimSliceCount];
 		AimSlice[] m_AimWalkingLookup = new AimSlice[AimSliceCount];
 
-		private ActorComponent m_Actor;
+		private ActorBaseComponent m_Actor;
 		private CustomFloatProperty m_GroundSpeedProperty;
 		private CustomBooleanProperty m_IsRunningProperty;
 		private Nima.Animation.ActorAnimation m_Idle;
@@ -38,20 +38,20 @@ namespace Nima.Unity
 
 		public void Start()
 		{
-			m_Actor = gameObject.GetComponent<ActorComponent>();
+			m_Actor = gameObject.GetComponent<ActorBaseComponent>();
 			if(m_Actor != null)
 			{
 				// Get a game object from the actor, use this to mount items or query for other components.
-				GameObject headColliderGameObject = m_Actor.GetActorGameObject("HeadCollider");
-				if(headColliderGameObject != null)
-				{
-					Collider2D collider = headColliderGameObject.GetComponent<Collider2D>();
-					if(collider != null)
-					{
-						// Set it to a trigger, or do something else with it...
-						// collider.isTrigger = true;
-					}
-				}
+				// GameObject headColliderGameObject = m_Actor.GetActorGameObject("HeadCollider");
+				// if(headColliderGameObject != null)
+				// {
+				// 	Collider2D collider = headColliderGameObject.GetComponent<Collider2D>();
+				// 	if(collider != null)
+				// 	{
+				// 		// Set it to a trigger, or do something else with it...
+				// 		// collider.isTrigger = true;
+				// 	}
+				// }
 				if(m_Actor.ActorInstance != null)
 				{
 					m_Idle = m_Actor.ActorInstance.GetAnimation("Idle");

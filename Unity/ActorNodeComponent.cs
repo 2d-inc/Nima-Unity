@@ -26,7 +26,8 @@ namespace Nima.Unity
 		public virtual void Initialize(ActorBaseComponent actorComponent)
 		{
 			m_ActorComponent = actorComponent;
-
+			gameObject.transform.parent = actorComponent.gameObject.transform;	
+			/*
 			ActorNodeComponent parentComponent = actorComponent.Nodes[m_ActorNode.ParentIdx];
 			if(parentComponent == this)
 			{
@@ -38,19 +39,20 @@ namespace Nima.Unity
 			{
 				gameObject.transform.parent = parentComponent.gameObject.transform;
 			}
-			UpdateTransform();
+			//UpdateTransform();
+			 */
 		}
 
 		public virtual void UpdateTransform()
 		{
-			if(m_ActorNode == null)
-			{
-				return;
-			}
-			m_ActorNode.UpdateTransforms();
-			transform.localEulerAngles = new Vector3(0.0f, 0.0f, m_ActorNode.RenderRotation * Mathf.Rad2Deg);
-			transform.localPosition = new Vector3(m_ActorNode.X, m_ActorNode.Y, 0.0f);
-			transform.localScale = new Vector3(m_ActorNode.ScaleX, m_ActorNode.ScaleY, 1.0f);
+			// if(m_ActorNode == null)
+			// {
+			// 	return;
+			// }
+			// //m_ActorNode.UpdateTransforms();
+			// transform.localEulerAngles = new Vector3(0.0f, 0.0f, m_ActorNode.Rotation * Mathf.Rad2Deg);
+			// transform.localPosition = new Vector3(m_ActorNode.X, m_ActorNode.Y, 0.0f);
+			// transform.localScale = new Vector3(m_ActorNode.ScaleX, m_ActorNode.ScaleY, 1.0f);
 		}
 	}
 }

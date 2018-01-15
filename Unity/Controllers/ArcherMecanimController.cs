@@ -10,7 +10,7 @@ namespace Nima.Unity
 		private Animator m_Animator;
 		private float m_HorizontalVelocity;
 		private bool m_IsRunning;
-		private ActorComponent m_Actor;
+		private ActorBaseComponent m_Actor;
 		private Nima.Animation.ActorAnimation m_Aim;
 		private float m_AimAnimationTime = 0.0f;
 		private Vector3 m_ActorLocalCursor;
@@ -29,7 +29,7 @@ namespace Nima.Unity
 		void Start()
 		{
 			m_Animator = GetComponent<Animator>();
-			m_Actor = gameObject.GetComponent<ActorComponent>();
+			m_Actor = gameObject.GetComponent<ActorBaseComponent>();
 			if(m_Actor != null)
 			{
 				if(m_Actor.ActorInstance != null)

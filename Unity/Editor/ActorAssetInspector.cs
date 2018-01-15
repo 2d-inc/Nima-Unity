@@ -45,39 +45,6 @@ namespace Nima.Unity.Editor
 					{
 						asset.Load();
 					}
-					/*foreach(ActorNodeComponent component in actorComponent.Nodes)
-					{
-						if(component is ActorImageComponent)// && component.Node != null)
-						{
-							//Debug.Log("HERE?1");
-							ActorImageComponent imageComponent = component as ActorImageComponent;
-							ActorImage imageNode = imageComponent.Node as ActorImage;
-							if(imageNode == null)
-							{
-								Debug.Log("It's an image but the node is nul");
-								continue;
-							}
-							if(!imageNode.IsSkinned)
-							{
-								Nima.Math2D.Mat2D worldTransform = imageNode.WorldTransform;
-								Matrix4x4 mat = Matrix4x4.identity;
-								mat[0,0] = worldTransform[0];
-								mat[1,0] = worldTransform[1];
-								mat[0,1] = worldTransform[2];
-								mat[1,1] = worldTransform[3];
-								mat[0,3] = worldTransform[4];
-								mat[1,3] = worldTransform[5];
-								MeshFilter filter = imageComponent.GetComponent<MeshFilter>();
-        						MeshRenderer renderer = filter.GetComponent<MeshRenderer>();
-								m_PreviewRenderUtility.DrawMesh(filter.sharedMesh, mat, renderer.sharedMaterial, 0);
-							}
-							
-						}
-					}*/
-
-					/*m_PreviewRenderUtility.m_Camera.transform.position = Vector2.zero;
-					m_PreviewRenderUtility.m_Camera.transform.rotation = Quaternion.Euler(new Vector3(-_drag.y, -_drag.x, 0));
-					m_PreviewRenderUtility.m_Camera.transform.position = m_PreviewRenderUtility.m_Camera.transform.forward * -6f;*/
 					m_PreviewRenderUtility.camera.Render();
 
 					Texture resultRender = m_PreviewRenderUtility.EndPreview();

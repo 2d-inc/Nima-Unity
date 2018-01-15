@@ -145,47 +145,31 @@ namespace Nima.Unity
 			}
 		}
 
-		private static void UpdateGameObjectsFor(ActorAsset actorAsset)
-		{
-			Object[] list = Resources.FindObjectsOfTypeAll(typeof(GameObject));
-			foreach(Object obj in list)
-			{
-				GameObject go = obj as GameObject;
-				ActorComponent actor = go.GetComponent<ActorComponent>();
-				if(actor != null && actor.Asset == actorAsset)
-				{
-					Debug.Log("FOUND ACTOR WITH UPDATED ASSET");
-					// We found an actor using the asset that got updated. Let's update the game object.
-					actor.InitializeFromAsset(actorAsset);
-				}
-			}
-		}
+		// [MenuItem("Assets/Nima/Instance Actor", false, 1)]
+		// static void InstanceActor () 
+		// {
+		// 	foreach (object obj in Selection.objects) 
+		// 	{
+		// 		ActorAsset actorAsset = obj as ActorAsset;
 
-		[MenuItem("Assets/Nima/Instance Actor", false, 1)]
-		static void InstanceActor () 
-		{
-			foreach (object obj in Selection.objects) 
-			{
-				ActorAsset actorAsset = obj as ActorAsset;
+		// 		string actorInstanceName = actorAsset.name;
+		// 		GameObject go = new GameObject(actorInstanceName, typeof(ActorComponent));
+		// 		go.GetComponent<ActorComponent>().SetActorAsset(actorAsset);
+		// 	}
+		// }
 
-				string actorInstanceName = actorAsset.name;
-				GameObject go = new GameObject(actorInstanceName, typeof(ActorComponent));
-				go.GetComponent<ActorComponent>().SetActorAsset(actorAsset);
-			}
-		}
-
-		[MenuItem("Assets/Nima/Instance Actor", true, 1)]
-		static bool ValidateInstanceActor () 
-		{
-			foreach (object o in Selection.objects) 
-			{
-				if (o == null || o.GetType() != typeof(ActorAsset))
-				{
-					return false;
-				}
-			}
-			return true;
-		}
+		// [MenuItem("Assets/Nima/Instance Actor", true, 1)]
+		// static bool ValidateInstanceActor () 
+		// {
+		// 	foreach (object o in Selection.objects) 
+		// 	{
+		// 		if (o == null || o.GetType() != typeof(ActorAsset))
+		// 		{
+		// 			return false;
+		// 		}
+		// 	}
+		// 	return true;
+		// }
 
 		[MenuItem("Assets/Nima/Instance Single Mesh Actor", false, 1)]
 		static void InstanceSingleMeshActor () 
