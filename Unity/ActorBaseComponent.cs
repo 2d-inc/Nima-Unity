@@ -185,7 +185,7 @@ namespace Nima.Unity
 
 		public void InitializeFromAsset(ActorAsset actorAsset)
 		{
-			HideFlags hideFlags = HideFlags.DontSaveInEditor | HideFlags.DontSaveInBuild | HideFlags.DontUnloadUnusedAsset;// | HideFlags.HideInHierarchy | HideFlags.HideInInspector;
+			HideFlags hideFlags = HideFlags.DontSaveInEditor | HideFlags.DontSaveInBuild | HideFlags.DontUnloadUnusedAsset | HideFlags.HideInHierarchy | HideFlags.HideInInspector;
 
 			m_ActorAsset = actorAsset;
 
