@@ -134,8 +134,8 @@ namespace Nima.Unity
 			m2d[1] = localTransform[1,0];
 			m2d[2] = localTransform[0,1];
 			m2d[3] = localTransform[1,1];
-			m2d[4] = localTransform[0,3] + world[4] * ActorAsset.NimaToUnityScale;
-			m2d[5] = localTransform[1,3] + world[5] * ActorAsset.NimaToUnityScale;
+			m2d[4] = localTransform[0,3] + world[4] * ActorAsset.NimaToUnityScale * localTransform[0,0];
+			m2d[5] = localTransform[1,3] + world[5] * ActorAsset.NimaToUnityScale * localTransform[1,1];
 
 
 			if(m_InheritRotation && m_InheritScale)
