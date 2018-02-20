@@ -157,7 +157,7 @@ namespace Nima.Unity
 				transform.localScale = new Vector3(scale[0]*m_ScaleModifier, scale[1]*m_ScaleModifier, 1.0f);
 			}
 
-			transform.localPosition = new Vector3(m2d[4], m2d[5], 0.0f);
+			transform.localPosition = new Vector3(m2d[4], m2d[5], transform.localPosition.z);
 		}
 		
 		public void OnFinalForm(ActorBaseComponent actorBase)
