@@ -81,6 +81,7 @@ namespace Nima.Unity
 							{
 								float position = i / (float)(AimSliceCount-1) * m_Aim.Duration;
 								m_Aim.Apply(position, m_Actor.ActorInstance, 1.0f);
+								m_Actor.ActorInstance.Advance(0.0f);
 								Mat2D worldTransform = muzzle.WorldTransform;
 
 								AimSlice slice = m_AimLookup[i];
@@ -88,7 +89,7 @@ namespace Nima.Unity
 								// Extract forward vector and position.
 								slice.dir = new Vec2D();
 								Vec2D.Normalize(slice.dir, new Vec2D(worldTransform[0], worldTransform[1]));
-								slice.point = new Vec2D(worldTransform[4], worldTransform[5]);
+								slice.point = new Vec2D(worldTransform[4]*ActorAsset.NimaToUnityScale, worldTransform[5]*ActorAsset.NimaToUnityScale);
 								m_AimLookup[i] = slice;
 							}
 						}
@@ -101,6 +102,7 @@ namespace Nima.Unity
 							{
 								float position = i / (float)(AimSliceCount-1) * m_Aim.Duration;
 								m_Aim.Apply(position, m_Actor.ActorInstance, 1.0f);
+								m_Actor.ActorInstance.Advance(0.0f);
 								Mat2D worldTransform = muzzle.WorldTransform;
 
 								AimSlice slice = m_AimWalkingLookup[i];
@@ -108,7 +110,7 @@ namespace Nima.Unity
 								// Extract forward vector and position.
 								slice.dir = new Vec2D();
 								Vec2D.Normalize(slice.dir, new Vec2D(worldTransform[0], worldTransform[1]));
-								slice.point = new Vec2D(worldTransform[4], worldTransform[5]);
+								slice.point = new Vec2D(worldTransform[4]*ActorAsset.NimaToUnityScale, worldTransform[5]*ActorAsset.NimaToUnityScale);
 								m_AimWalkingLookup[i] = slice;
 							}
 						}
@@ -134,7 +136,7 @@ namespace Nima.Unity
 
 			Actor actorInstance = m_Actor.ActorInstance;
 
-			float scaleX = ActorAsset.NimaToUnityScale;
+			float scaleX = 1.0f;//ActorAsset.NimaToUnityScale;
 			// Find cursor position in world space.
 			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 			Vector3 actorLocalCursor = m_Actor.gameObject.transform.InverseTransformPoint(ray.origin);
