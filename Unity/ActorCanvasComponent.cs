@@ -66,6 +66,51 @@ namespace Nima.Unity
 			m_DrawOrderRoot.hideFlags = hideFlags;
 		}
 
+		/// <summary>
+		/// Force set the material for a specific blend mode. Note that this leaves texture atlas and shader selection up to you!
+		/// </summary>
+		public void SetMaterial(Material material, BlendModes blendMode)
+		{
+			foreach(ActorCanvasImageComponent component in m_ImageComponents)
+			{
+				if(component == null || component.Node == null || (component.Node as ActorImage).BlendMode != blendMode)
+				{
+					continue;
+				}
+				component.m_Material = material;
+			}
+		}
+
+		/// <summary>
+		/// Force set the material for the entire set of components. Note that this leaves texture atlas and shader selection up to you!
+		/// </summary>
+		public void SetMaterial(Material material)
+		{
+			foreach(ActorCanvasImageComponent component in m_ImageComponents)
+			{
+				if(component == null)
+				{
+					continue;
+				}
+				component.m_Material = material;
+			}
+		}
+
+		/// <summary>
+		/// Set the material for the a component with name nodeName. Note that this leaves texture atlas and shader selection up to you!
+		/// </summary>
+		public void SetMaterial(Material material, String nodeName)
+		{
+			foreach(ActorCanvasImageComponent component in m_ImageComponents)
+			{
+				if(component == null || component.Node == null || component.Node.Name != nodeName)
+				{
+					continue;
+				}
+				component.m_Material = material;
+			}
+		}
+		
 		protected override ActorNodeComponent MakeImageNodeComponent(int imageNodeIndex, ActorImage actorImage)
 		{
 			GameObject gameObject = new GameObject(actorImage.Name, typeof(ActorNodeComponent));
