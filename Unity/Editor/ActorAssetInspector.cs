@@ -52,5 +52,10 @@ namespace Nima.Unity.Editor
 				}
 			}
 		}
+
+		public void OnDisable()
+		{
+			m_PreviewRenderUtility.Cleanup();
+		}
 	}
 }
