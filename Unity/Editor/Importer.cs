@@ -54,7 +54,9 @@ namespace Nima.Unity
 
 				// This is our identifier for a Nima Character being added to the assets.
 				// Due to how Unity implements custom assets, we have to use the .bytes extension to support it being accessed as a TextAsset type.
-				if(secondExtension == ".nima" && extension == ".bytes")
+				if(
+					(secondExtension == ".nma" && extension == ".bytes") ||
+					(secondExtension == ".nima" && extension == ".bytes"))
 				{
 					// Get filename without .nima.bytes
 					filename = Path.GetFileNameWithoutExtension(filename);
